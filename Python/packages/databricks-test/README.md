@@ -49,7 +49,7 @@ def test_method():
 ```
 
 You can set up [mocks](https://docs.python.org/dev/library/unittest.mock.html) on
-`dbrickstest.dbutils` and `dbrickstest.display`, for example:
+`dbrickstest`, for example:
 
 ```python
 dbrickstest.dbutils.widgets.get.return_value = "myvalue"
@@ -59,7 +59,7 @@ See samples below for more examples.
 
 ## Supported features
 
-* Spark context injected into Databricks notebooks: `spark`, `table`
+* Spark context injected into Databricks notebooks: `spark`, `table`, `sql` etc.
 * PySpark with all Spark features including reading and writing to disk, UDFs and Pandas UDFs
 * Databricks Utilities (`dbutils`, `display`) with user-configurable mocks
 * Mocking connectors such as Azure Storage, S3 and SQL Data Warehouse
@@ -68,7 +68,8 @@ See samples below for more examples.
 
 * Notebook formats other than `.py` (`.ipynb`, `.dbc`) are not supported
 * Non-python cells such as `%scala` and `%sql` (those cells are skipped, as they are stored in `.py` notebooks as comments)
-* Writing directly to `/dbfs` mount on local filesystem
+* Writing directly to `/dbfs` mount on local filesystem:
+  write to a local temporary file instead and use dbutils.fs.cp() to copy to DBFS, which you can intercept with a mock
 * Databricks extensions to Spark such as `spark.read.format("binaryFile")`
 
 ## Sample test
