@@ -48,8 +48,7 @@ def test_method():
         # ...
 ```
 
-You can set up [mocks](https://docs.python.org/dev/library/unittest.mock.html) on
-`dbrickstest`, for example:
+You can set up [mocks](https://docs.python.org/dev/library/unittest.mock.html) on `dbrickstest`, for example:
 
 ```python
 dbrickstest.dbutils.widgets.get.return_value = "myvalue"
