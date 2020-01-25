@@ -1,4 +1,4 @@
-# databricks_client
+# databricks-client
 
 ## About
 
