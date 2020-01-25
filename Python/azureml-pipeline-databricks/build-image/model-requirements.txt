@@ -1,0 +1,5 @@
+# Modules needed both in the scoring container and the CI environment
+scikit-learn==0.22.1
+scipy==1.4.1
+numpy==1.18.0
+inference-schema==1.0.1

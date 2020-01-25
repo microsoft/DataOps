@@ -1,0 +1,17 @@
+variables:
+- name: EXPERIMENT_NAME
+  value: mlopspython
+- name: BUILDCONTAINER_NAME
+  value: model
+- name: PIPELINE_NAME
+  value: Training-Pipeline
+- name: AML_COMPUTE_NAME
+  value: model-training
+- name: DATABRICKS_WORKSPACE_NAME
+  value: dbricksmyappdataopsstage
+- name: DATABRICKS_COMPUTE_NAME
+  value: databricks
+- name: MODEL_NAME
+  value: model.pkl
+- name: TRAINING_ACCOUNT_NAME
+  value: stmyappdataopstrstage

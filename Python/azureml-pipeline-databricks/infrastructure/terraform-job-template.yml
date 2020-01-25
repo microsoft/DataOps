@@ -1,0 +1,47 @@
+parameters:
+  environment: test
+  TerraformArguments: ''
+  TerraformEnvVariables:
+
+- job: Terraform
+  displayName: Terraform
+  steps:
+
+  - bash: |
+      cp infrastructure/terraform_backend/* infrastructure/terraform
+    displayName: Copy terraform backend config to terraform directory
+    workingDirectory: $(System.DefaultWorkingDirectory)
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformDirectory: $(System.DefaultWorkingDirectory)/infrastructure/terraform
+      environment: ${{ parameters.environment }}
+
+  # Using bash instead of Terraform extension because of following issues:
+  # - https://github.com/microsoft/azure-pipelines-extensions/issues/748
+  # - https://github.com/microsoft/azure-pipelines-extensions/issues/725
+  # - https://github.com/microsoft/azure-pipelines-extensions/issues/747
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformDirectory: $(System.DefaultWorkingDirectory)/infrastructure/terraform
+      environment: ${{ parameters.environment }}
+      provisionStorage: false
+
+  - bash: |
+      set -eu
+      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+      terraform apply -input=false -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
+    displayName: Terraform apply
+    workingDirectory: $(System.DefaultWorkingDirectory)/infrastructure/terraform
+
+  - bash: |
+      set -eu
+      terraform output -json | jq -r '
+        . as $in
+        | keys[] 
+        | ["##vso[task.setvariable variable=" + . + ";isOutput=true;isSecret=" + ($in[.].sensitive | tostring) + "]" + ($in[.].value | tostring)]
+        | @tsv'
+    name: TerraformOutputs
+    displayName: Export terraform outputs
+    workingDirectory: $(System.DefaultWorkingDirectory)/infrastructure/terraform

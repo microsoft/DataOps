@@ -1,0 +1,23 @@
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - infrastructure/
+
+variables:
+- group: terraform
+- group: ml-infrastructure
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+- template: terraform-job-template.yml
+  parameters:
+    environment: test
+    TerraformEnvVariables:
+      # Define any external terraform secrets here
+      # TF_VAR_<TERRAFORM_VARIABLE>: $(AZDO_SECRET_VARIABLE_NAME)
