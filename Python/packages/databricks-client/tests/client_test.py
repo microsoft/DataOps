@@ -2,6 +2,7 @@ import databricks_client
 import os
 import pytest
 import requests
+import requests_mock
 import adal
 from azure.common.credentials import get_azure_cli_credentials
 
@@ -14,7 +15,10 @@ resource_id = (
     'Microsoft.Databricks/workspaces/%s' %
     (subscription_id, resource_group, workspace_name)
 )
-
+non_provisioned_response = {
+    "error_code": "INVALID_PARAMETER_VALUE",
+    "message":
+        "Unknown worker environment WorkerEnvId(workerenv-63435k2940201085)"}
 
 client_id = os.environ["CLIENT_ID"]
 client_secret = os.environ["CLIENT_SECRET"]
@@ -102,3 +106,36 @@ def test_credentials_msrest():
             resource, client_id, client_secret)["accessToken"]
     client.auth_azuread(resource_id, token_callback)
     get_clusters_list(client)
+
+
+def test_ensure_available_when_provisioning():
+    with requests_mock.Mocker() as m:
+        m.register_uri('GET', 'mock://test.com/instance-pools/list', [
+            {'json': non_provisioned_response, 'status_code': 400},
+            {'json': non_provisioned_response, 'status_code': 400},
+            {'json': {}, 'status_code': 200},
+        ])
+        client = databricks_client.create('mock://test.com')
+        client.ensure_available()
+
+
+def test_ensure_available_when_provisioned():
+    with requests_mock.Mocker() as m:
+        m.register_uri('GET', 'mock://test.com/instance-pools/list', [
+            {'json': {}, 'status_code': 200},
+        ])
+        client = databricks_client.create('mock://test.com')
+        client.ensure_available()
+
+
+def test_ensure_available_when_timingout():
+    with requests_mock.Mocker() as m:
+        m.register_uri('GET', 'mock://test.com/xyz', [
+            {'json': non_provisioned_response, 'status_code': 400},
+        ])
+        client = databricks_client.create('mock://test.com')
+        try:
+            client.ensure_available(url="xyz", retries=2, delay_seconds=0.01)
+            pytest.fail("Should have thrown DatabricksNotAvailableException")
+        except databricks_client.DatabricksNotAvailableException:
+            pass

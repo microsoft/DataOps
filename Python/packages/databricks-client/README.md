@@ -27,10 +27,23 @@ import databricks_client
 
 client = databricks_client.create("https://northeurope.azuredatabricks.net/api/2.0")
 client.auth_pat_token(pat_token)
+client.ensure_available()
 clusters_list = client.get('clusters/list')
 for cluster in clusters_list["clusters"]:
     print(cluster)
 ```
+
+## Usage with a newly provisioned workspace
+
+If using this module as part of a provisioning job, you need to call `client.ensure_available()`.
+
+When the first user logs it to a new Databricks workspace, workspace provisioning is triggered,
+and the API is not available until that job has completed (that usually takes under a minute,
+but could take longer depending on the network configuration).
+
+The method `client.ensure_available(url="instance-pools/list", retries=100, delay_seconds=6)`
+attempts connecting to the provided URL and retries as long as the workspace is in provisioning
+state, or until the given number of retries has elapsed.
 
 ## Usage with Azure Active Directory
 
@@ -54,6 +67,7 @@ import databricks_client
 client = databricks_client.create("https://northeurope.azuredatabricks.net/api/2.0")
 client.auth_azuread("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/my-rg/providers/Microsoft.Databricks/workspaces/my-workspace")
 # or client.auth_azuread(resource_group="my-rg", workspace_name="my-workspace")
+client.ensure_available()
 clusters_list = client.get('clusters/list')
 for cluster in clusters_list["clusters"]:
     print(cluster)
@@ -82,6 +96,7 @@ def token_callback(resource):
 client = databricks_client.create("https://northeurope.azuredatabricks.net/api/2.0")
 client.auth_azuread("/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/my-rg/providers/Microsoft.Databricks/workspaces/my-workspace", token_callback)
 # or client.auth_azuread(resource_group="my-rg", workspace_name="my-workspace", token_callback=token_callback)
+client.ensure_available()
 clusters_list = client.get('clusters/list')
 for cluster in clusters_list["clusters"]:
     print(cluster)
