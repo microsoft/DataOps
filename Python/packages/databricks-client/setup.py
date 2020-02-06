@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='databricks_client',
-    version='0.0.1',
+    version='0.0.2',
     author="Alexandre Gattiker",
     author_email="algattik@microsoft.com",
     description="REST client for Databricks",
@@ -17,7 +17,7 @@ setuptools.setup(
         'requests'
     ],
     extras_require={
-        'azurecli':  ["azure-core"]
+        'azurecli': ["azure-core"]
     },
     classifiers=[
         "Programming Language :: Python :: 3",
