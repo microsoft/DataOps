@@ -3,6 +3,10 @@
 # For suggested naming conventions, refer to:
 #   https://docs.microsoft.com/en-us/azure/cloud-adoption-framework/ready/azure-best-practices/naming-and-tagging
 
+data "azuread_service_principal" "devops_mlpipeline" {
+  display_name = "DataOpsML Azure DevOps ML Model CI/CD pipeline"
+}
+
 # Resource Group
 
 resource "azurerm_resource_group" "main" {
@@ -17,7 +21,7 @@ module "azureml" {
   location = var.location
   tenant_id = data.azurerm_client_config.current.tenant_id
   resource_group_name = azurerm_resource_group.main.name
-  devops_mlpipeline_sp_object_id = var.devops_mlpipeline_sp_object_id
+  devops_mlpipeline_sp_object_id = data.azuread_service_principal.devops_mlpipeline.id
 }
 
 module "training-data" {
@@ -34,5 +38,5 @@ module "databricks" {
   environment = var.environment
   resource_group_name = azurerm_resource_group.main.name
   location = var.location
-  devops_mlpipeline_sp_object_id = var.devops_mlpipeline_sp_object_id
+  devops_mlpipeline_sp_object_id = data.azuread_service_principal.devops_mlpipeline.id
 }

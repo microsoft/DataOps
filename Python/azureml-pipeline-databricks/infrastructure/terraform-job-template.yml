@@ -1,6 +1,7 @@
 parameters:
   environment: test
   TerraformArguments: ''
+  TerraformEnvVariables:
   TerraformVersion: 0.12.20
   TerraformBackendServiceConnection: DataOpsML Azure DevOps Terraform pipeline
   TerraformEnvironmentServiceConnection: DataOpsML Azure DevOps Terraform pipeline
@@ -49,11 +50,13 @@ jobs:
   # - https://github.com/microsoft/azure-pipelines-extensions/issues/747
 
   - bash: |
+      set -eu
+      export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
       terraform apply -input=false -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
     displayName: Terraform apply
     workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
     env:
-      ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
+      ${{ parameters.TerraformEnvVariables }}
 
   - bash: |
       set -eu
