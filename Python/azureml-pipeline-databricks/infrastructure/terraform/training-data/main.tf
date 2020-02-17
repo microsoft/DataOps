@@ -14,7 +14,6 @@ resource "azurerm_storage_container" "training_data" {
 
 resource "azurerm_storage_blob" "training_data" {
   name                  = "trainingdata.csv"
-  resource_group_name    = var.resource_group_name
   storage_account_name   = azurerm_storage_account.training_data.name
   storage_container_name = azurerm_storage_container.training_data.name
   type                   = "Block"

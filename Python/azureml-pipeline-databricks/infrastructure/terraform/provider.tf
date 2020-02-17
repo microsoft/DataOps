@@ -9,10 +9,6 @@ provider "azurerm" {
   version = "=1.44.0"
 }
 
-provider "azuread" {
-  version = "=0.7.0"
-}
-
 # Data
 
 # Provides client_id, tenant_id, subscription_id and object_id variables
