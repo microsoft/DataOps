@@ -18,6 +18,8 @@ jobs:
 - template: infrastructure/terraform-job-template.yml
   parameters:
     environment: test
+    TerraformBackendResourceGroup: $(TERRAFORM_BACKEND_RG)
+    TerraformBackendStorageAccount: $(TERRAFORM_BACKEND_STORAGE)
 
 - job: Post_terraform
   dependsOn: Terraform
