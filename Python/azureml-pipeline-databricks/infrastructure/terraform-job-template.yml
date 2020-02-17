@@ -52,7 +52,7 @@ jobs:
   - bash: |
       set -eu
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
-      terraform apply -input=false -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
+      terraform apply -input=false -auto-approve -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
     displayName: Terraform apply
     workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
     env:
