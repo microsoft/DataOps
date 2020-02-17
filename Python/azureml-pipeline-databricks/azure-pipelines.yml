@@ -20,7 +20,7 @@ jobs:
     TerraformBackendResourceGroup: $(TERRAFORM_BACKEND_RG)
     TerraformBackendStorageAccount: $(TERRAFORM_BACKEND_STORAGE)
     TerraformEnvVariables:
-      TF_VAR_location=$(LOCATION)
+      TF_VAR_location: $(LOCATION)
 
 - job: Post_terraform
   dependsOn: Terraform
