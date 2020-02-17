@@ -22,7 +22,7 @@ jobs:
   - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV1@0
     displayName: Terraform init
     inputs:
-      workingDirectory: infrastructure/terraform
+      workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
       backendServiceArm: ${{ parameters.TerraformBackendServiceConnection }}
       backendAzureRmResourceGroupName: ${{ parameters.TerraformBackendResourceGroup }}
       backendAzureRmStorageAccountName: ${{ parameters.TerraformBackendStorageAccount }}
@@ -51,7 +51,7 @@ jobs:
   - bash: |
       terraform apply -input=false -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
     displayName: Terraform apply
-    workingDirectory: $(System.DefaultWorkingDirectory)/infrastructure/terraform
+    workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
     env:
       ARM_CLIENT_SECRET: $(ARM_CLIENT_SECRET)
 
@@ -64,4 +64,4 @@ jobs:
         | @tsv'
     name: TerraformOutputs
     displayName: Export terraform outputs
-    workingDirectory: $(System.DefaultWorkingDirectory)/infrastructure/terraform
+    workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
