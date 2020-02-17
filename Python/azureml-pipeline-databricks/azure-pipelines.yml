@@ -15,7 +15,7 @@ pool:
   vmImage: ubuntu-latest
 
 jobs:
-- template: terraform/terraform-job-template.yml
+- template: infrastructure/terraform-job-template.yml
   parameters:
     environment: test
 
