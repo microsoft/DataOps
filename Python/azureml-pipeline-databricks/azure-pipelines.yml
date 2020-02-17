@@ -9,7 +9,6 @@ trigger:
 
 variables:
 - group: terraform
-- group: ml-infrastructure
 
 pool:
   vmImage: ubuntu-latest
