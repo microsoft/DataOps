@@ -10,7 +10,7 @@ provider "azurerm" {
 }
 
 provider "azuread" {
-  version = "=0.3.0"
+  version = "=0.7.0"
 }
 
 # Data
