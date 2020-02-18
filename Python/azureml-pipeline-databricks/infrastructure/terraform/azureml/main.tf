@@ -135,7 +135,7 @@ resource "azurerm_key_vault_access_policy" "client_keyvault" {
   key_vault_id = azurerm_key_vault.aml.id
 
   tenant_id = azurerm_key_vault.aml.tenant_id
-  application_id = var.client_id
+  object_id = var.object_id
 
   secret_permissions = [
     "get",

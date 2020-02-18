@@ -18,7 +18,7 @@ variable "tenant_id" {
   type    = string
 }
 
-variable "client_id" {
+variable "object_id" {
   type    = string
 }
 
