@@ -20,14 +20,7 @@ environment:
   version:
 # Environment variables set for the run.
   environmentVariables:
-    BUILD_BUILDID: ${BUILD_BUILDID}
-    DATABRICKS_COMPUTE_NAME: ${DATABRICKS_COMPUTE_NAME}
-    DATABRICKS_REGION: ${DATABRICKS_REGION}
-    DATABRICKS_WORKSPACE_NAME: ${DATABRICKS_WORKSPACE_NAME}
-    RESOURCE_GROUP: ${RESOURCE_GROUP}
-    SUBSCRIPTION_ID: ${SUBSCRIPTION_ID}
-    TRAINING_ACCOUNT_NAME: ${TRAINING_ACCOUNT_NAME}
-    WORKSPACE_NAME: ${WORKSPACE_NAME}
+    SAMPLE_VARIABLE: SAMPLE_VALUE
 # Python details
   python:
 # user_managed_dependencies=True indicates that the environmentwill be user managed. False indicates that AzureML willmanage the user environment.
