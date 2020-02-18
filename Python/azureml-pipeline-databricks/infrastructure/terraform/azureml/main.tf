@@ -17,11 +17,6 @@ resource "azurerm_key_vault" "aml" {
   tenant_id                   = var.tenant_id
 
   sku_name = "standard"
-
-  network_acls {
-    default_action = "Deny"
-    bypass         = "AzureServices"
-  }
 }
 
 # Application Insights
