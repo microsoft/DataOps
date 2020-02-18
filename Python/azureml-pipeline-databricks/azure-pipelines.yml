@@ -44,4 +44,4 @@ jobs:
           az extension  add -n azure-cli-ml
           az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
           az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
-          python build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME
+          az ml run submit-script -e ci -c build_ml_pipeline.yaml build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME --build_id $BUILD_BUILDID
