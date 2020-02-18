@@ -21,7 +21,7 @@ jobs:
     TerraformBackendStorageAccount: $(TERRAFORM_BACKEND_STORAGE)
     TerraformEnvVariables:
       TF_VAR_location: $(LOCATION)
-      TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_ID)
+      TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
 
 - job: Post_terraform
   dependsOn: Terraform
