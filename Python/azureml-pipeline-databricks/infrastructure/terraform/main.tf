@@ -17,6 +17,7 @@ module "azureml" {
   location = var.location
   tenant_id = data.azurerm_client_config.current.tenant_id
   resource_group_name = azurerm_resource_group.main.name
+  client_id = data.azurerm_client_config.current.client_id
   devops_mlpipeline_sp_object_id = var.devops_mlpipeline_sp_object_id
   aml_run_sp_client_id = var.aml_run_sp_client_id
   aml_run_sp_client_secret = var.aml_run_sp_client_secret

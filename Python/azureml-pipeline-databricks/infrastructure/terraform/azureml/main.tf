@@ -131,14 +131,29 @@ resource "azurerm_role_assignment" "mlworkspace_mlpipeline" {
 
 # Secret
 
+resource "azurerm_key_vault_access_policy" "client_keyvault" {
+  key_vault_id = azurerm_key_vault.aml.id
+
+  tenant_id = azurerm_key_vault.aml.tenant_id
+  object_id = var.client_id
+
+  secret_permissions = [
+    "get",
+    "set",
+    "delete",
+  ]
+}
+
 resource "azurerm_key_vault_secret" "client_id" {
   name         = "ClientId"
   value        = var.aml_run_sp_client_id
   key_vault_id = azurerm_key_vault.aml.id
+  depends_on   = [azurerm_key_vault_access_policy.client_keyvault]
 }
 
 resource "azurerm_key_vault_secret" "client_secret" {
   name         = "ClientSecret"
   value        = var.aml_run_sp_client_secret
   key_vault_id = azurerm_key_vault.aml.id
+  depends_on   = [azurerm_key_vault_access_policy.client_keyvault]
 }
