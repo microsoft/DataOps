@@ -30,7 +30,6 @@ jobs:
   variables:
     resource_group_name: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.resource_group_name'] ]
     aml_workspace_name: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.aml_workspace_name'] ]
-    DATABRICKS_REGION: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.databricks_region'] ]
   steps:
     - task: AzureCLI@1
       displayName: Build train pipeline
@@ -39,4 +38,7 @@ jobs:
         scriptLocation: inlineScript
         workingDirectory: Python/azureml-pipeline-databricks
         inlineScript: |
+          az extension  add -n azure-cli-ml
+          az ml folder attach -g $(resource_group_name) -w $(aml_workspace_name)
+          az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
           python -m ml_service.pipelines.build_train_pipeline

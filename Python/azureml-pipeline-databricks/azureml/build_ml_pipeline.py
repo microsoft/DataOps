@@ -34,7 +34,7 @@ def create_databricks_compute(
     access_token: str,
 ):
     compute_config = DatabricksCompute.attach_configuration(
-        resource_group=os.environ['RESOURCE_GROUP'],
+        resource_group=workspace.resource_group,
         workspace_name=os.environ['DATABRICKS_WORKSPACE_NAME'],
         access_token=access_token)
 
