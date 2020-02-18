@@ -222,7 +222,7 @@ def main():
     published_pipeline = ml_pipeline.publish(
         name="Feature Engineering",
         description="Feature engineering pipeline",
-        version=os.environ['BUILD_BUILDID'],
+        version=os.getenv("BUILD_BUILDID"),
     )
     print(f"Published pipeline: {published_pipeline.name}")
     print(f"for build {published_pipeline.version}")

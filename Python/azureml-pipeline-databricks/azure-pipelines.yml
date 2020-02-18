@@ -28,8 +28,8 @@ jobs:
 - job: Post_terraform
   dependsOn: Terraform
   variables:
-    RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.resource_group_name'] ]
-    WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.aml_workspace_name'] ]
+    RESOURCE_GROUP: $[ dependencies.Terraform.outputs['TerraformOutputs.resource_group_name'] ]
+    WORKSPACE_NAME: $[ dependencies.Terraform.outputs['TerraformOutputs.aml_workspace_name'] ]
   steps:
     - task: AzureCLI@1
       displayName: Build train pipeline
