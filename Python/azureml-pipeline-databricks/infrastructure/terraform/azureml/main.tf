@@ -128,3 +128,17 @@ resource "azurerm_role_assignment" "mlworkspace_mlpipeline" {
   role_definition_name = "Contributor"
   principal_id         = var.devops_mlpipeline_sp_object_id
 }
+
+# Secret
+
+resource "azurerm_key_vault_secret" "client_id" {
+  name         = "ClientId"
+  value        = var.aml_run_sp_client_id
+  key_vault_id = azurerm_key_vault.aml.id
+}
+
+resource "azurerm_key_vault_secret" "client_secret" {
+  name         = "ClientSecret"
+  value        = var.aml_run_sp_client_secret
+  key_vault_id = azurerm_key_vault.aml.id
+}

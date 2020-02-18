@@ -18,6 +18,8 @@ module "azureml" {
   tenant_id = data.azurerm_client_config.current.tenant_id
   resource_group_name = azurerm_resource_group.main.name
   devops_mlpipeline_sp_object_id = var.devops_mlpipeline_sp_object_id
+  aml_run_sp_client_id = var.aml_run_sp_client_id
+  aml_run_sp_client_secret = var.aml_run_sp_client_secret
 }
 
 module "training-data" {

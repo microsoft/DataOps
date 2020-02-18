@@ -20,5 +20,15 @@ variable "tenant_id" {
 
 variable "devops_mlpipeline_sp_object_id" {
   type    = string
-  description = "Service principal for the Azure DevOps ML Model CI/CD pipeline service connection"
+  description = "Service principal object ID for the Azure DevOps ML Model CI/CD pipeline service connection"
+}
+
+variable "devops_mlpipeline_sp_client_id" {
+  type    = string
+  description = "Service principal client ID for the Azure DevOps ML Model CI/CD pipeline service connection"
+}
+
+variable "devops_mlpipeline_sp_client_secret" {
+  type    = string
+  description = "Service principal client secret for the Azure DevOps ML Model CI/CD pipeline service connection"
 }

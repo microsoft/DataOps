@@ -22,6 +22,8 @@ jobs:
     TerraformEnvVariables:
       TF_VAR_location: $(LOCATION)
       TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
+      TF_VAR_aml_run_sp_client_id: $(AML_RUN_SP_CLIENT_ID)
+      TF_VAR_aml_run_sp_client_secret: $(AML_RUN_SP_CLIENT_SECRET)
 
 - job: Post_terraform
   dependsOn: Terraform
