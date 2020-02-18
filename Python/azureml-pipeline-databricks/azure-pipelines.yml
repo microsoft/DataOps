@@ -28,8 +28,8 @@ jobs:
 - job: Post_terraform
   dependsOn: Terraform
   variables:
-    resource_group_name: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.resource_group_name'] ]
-    aml_workspace_name: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.aml_workspace_name'] ]
+    RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.resource_group_name'] ]
+    WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Terraform.TerraformOutputs.aml_workspace_name'] ]
   steps:
     - task: AzureCLI@1
       displayName: Build train pipeline
@@ -38,7 +38,9 @@ jobs:
         scriptLocation: inlineScript
         workingDirectory: Python/azureml-pipeline-databricks
         inlineScript: |
+          set -eux  # fail on error
+          env
           az extension  add -n azure-cli-ml
-          az ml folder attach -g $(resource_group_name) -w $(aml_workspace_name)
+          az ml folder attach -g $(RESOURCE_GROUP) -w $(WORKSPACE_NAME)
           az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
           python -m ml_service.pipelines.build_train_pipeline
