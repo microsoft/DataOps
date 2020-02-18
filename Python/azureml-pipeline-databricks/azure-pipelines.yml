@@ -35,5 +35,6 @@ jobs:
       inputs:
         azureSubscription: DataOpsML Azure DevOps ML Model CI/CD pipeline
         scriptLocation: inlineScript
+        workingDirectory: Python/azureml-pipeline-databricks
         inlineScript: |
           python -m ml_service.pipelines.build_train_pipeline
