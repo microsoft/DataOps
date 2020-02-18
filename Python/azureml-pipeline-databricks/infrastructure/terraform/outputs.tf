@@ -14,6 +14,10 @@ output "aml_workspace_name" {
     value = module.azureml.name
 }
 
+output "databricks_workspace_name" {
+    value = module.databricks.name
+}
+
 output "databricks_location" {
     value = module.databricks.location
 }

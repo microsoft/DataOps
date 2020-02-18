@@ -29,18 +29,19 @@ jobs:
   dependsOn: Terraform
   variables:
     RESOURCE_GROUP: $[ dependencies.Terraform.outputs['TerraformOutputs.resource_group_name'] ]
-    WORKSPACE_NAME: $[ dependencies.Terraform.outputs['TerraformOutputs.aml_workspace_name'] ]
+    AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['TerraformOutputs.aml_workspace_name'] ]
+    DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['TerraformOutputs.databricks_workspace_name'] ]
   steps:
     - task: AzureCLI@1
       displayName: Build train pipeline
       inputs:
         azureSubscription: DataOpsML Azure DevOps ML Model CI/CD pipeline
         scriptLocation: inlineScript
-        workingDirectory: Python/azureml-pipeline-databricks
+        workingDirectory: Python/azureml-pipeline-databricks/azureml
         inlineScript: |
           set -eux  # fail on error
           env
           az extension  add -n azure-cli-ml
-          az ml folder attach -g $(RESOURCE_GROUP) -w $(WORKSPACE_NAME)
+          az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
           az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
-          python -m ml_service.pipelines.build_train_pipeline
+          python build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME
