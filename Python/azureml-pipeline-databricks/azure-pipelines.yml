@@ -44,11 +44,13 @@ jobs:
         workingDirectory: Python/azureml-pipeline-databricks/azureml
         inlineScript: |
           set -eu  # fail on error
+          set -x  # verbose
           az extension add -n azure-cli-ml
           az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
           az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
           az ml run submit-script -e $EXPERIMENT_NAME-ci -c build_ml_pipeline.yaml -t run_info.json build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME --build_id $BUILD_BUILDID
           run_id=$(jq -r .run_id run_info.json)
+          set +x  # non-verbose
           echo -n "##vso[task.setvariable variable=AMLPIPELINE_ID;isOutput=true]"
           az ml run show --run $run_id -e $EXPERIMENT_NAME-ci --query tags.PipelineId -o tsv
 
