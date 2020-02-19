@@ -125,24 +125,21 @@ def main():
 
 
     # Get Azure machine learning workspace
+    aml_run = Run.get_context()
     try:
-        aml_run = Run.get_context(allow_offline=False)
-    except:
-        aml_run = None
-
-    if aml_run:
         run_ws = aml_run.experiment.workspace
-        vault = run_ws.get_default_keyvault()
-        tenant_id = vault.get_secret("TenantId")
-        client_id = vault.get_secret("ClientId")
-        client_secret = vault.get_secret("ClientSecret")
-        auth = ServicePrincipalAuthentication(
-            tenant_id=tenant_id,
-            service_principal_id=client_id,
-            service_principal_password=client_secret)
-        aml_workspace = Workspace(run_ws.subscription_id, run_ws.resource_group, run_ws.name, auth=auth)
-    else:
-        aml_workspace = Workspace.from_config()
+    except:
+        run_ws = Workspace.from_config()
+
+    vault = run_ws.get_default_keyvault()
+    tenant_id = vault.get_secret("TenantId")
+    client_id = vault.get_secret("ClientId")
+    client_secret = vault.get_secret("ClientSecret")
+    auth = ServicePrincipalAuthentication(
+        tenant_id=tenant_id,
+        service_principal_id=client_id,
+        service_principal_password=client_secret)
+    aml_workspace = Workspace(run_ws.subscription_id, run_ws.resource_group, run_ws.name, auth=auth)
 
 
     print(aml_workspace)
@@ -256,6 +253,9 @@ def main():
     )
     print(f"Published pipeline: {published_pipeline.name}")
     print(f"for build {published_pipeline.version}")
+
+    # Save the Pipeline ID for other AzDO jobs after script is complete
+    aml_run.tag("PipelineId", published_pipeline.id)
 
 
 if __name__ == "__main__":

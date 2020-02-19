@@ -40,8 +40,20 @@ jobs:
         workingDirectory: Python/azureml-pipeline-databricks/azureml
         inlineScript: |
           set -eux  # fail on error
-          env
-          az extension  add -n azure-cli-ml
+          experimentName=ci
+          az extension add -n azure-cli-ml
           az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
           az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
-          az ml run submit-script -e ci -c build_ml_pipeline.yaml build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME --build_id $BUILD_BUILDID
+          az ml run submit-script -e $experimentName -c build_ml_pipeline.yaml -t run_info.json build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME --build_id $BUILD_BUILDID
+          run_id=$(jq -r .run_id run_info.json)
+          echo -n "##vso[task.setvariable variable=PIPELINE_ID]"
+          az ml run show --run $run_id -e $experimentName --query tags.PipelineId -o tsv
+
+    - task: AzureCLI@1
+      displayName: XXX
+      inputs:
+        azureSubscription: DataOpsML Azure DevOps ML Model CI/CD pipeline
+        scriptLocation: inlineScript
+        workingDirectory: Python/azureml-pipeline-databricks/azureml
+        inlineScript: |
+          echo $PIPELINE_ID
