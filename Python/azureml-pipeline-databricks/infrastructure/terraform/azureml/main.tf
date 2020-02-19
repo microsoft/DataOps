@@ -152,3 +152,10 @@ resource "azurerm_key_vault_secret" "client_secret" {
   key_vault_id = azurerm_key_vault.aml.id
   depends_on   = [azurerm_key_vault_access_policy.client_keyvault]
 }
+
+resource "azurerm_key_vault_secret" "tenant_id" {
+  name         = "TenantId"
+  value        = var.tenant_id
+  key_vault_id = azurerm_key_vault.aml.id
+  depends_on   = [azurerm_key_vault_access_policy.client_keyvault]
+}
