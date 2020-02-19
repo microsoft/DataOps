@@ -29,6 +29,7 @@ jobs:
 
 - job: Build_Pipeline
   dependsOn: Terraform
+  displayName: Build ML Training Pipeline
   variables:
     RESOURCE_GROUP: $[ dependencies.Terraform.outputs['TerraformOutputs.resource_group_name'] ]
     AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['TerraformOutputs.aml_workspace_name'] ]
@@ -64,8 +65,8 @@ jobs:
     AMLPIPELINE_ID: $[ dependencies.Build_Pipeline.outputs['TrainPipeline.AMLPIPELINE_ID'] ]
   steps:
   - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
-    #displayName: Invoke ML pipeline
+    displayName: Invoke ML pipeline
     inputs:
-      azureSubscription: DataOpsML Azure DevOps ML Model CI/CD pipeline
+      azureSubscription: DataOpsML Azure DevOps Azure ML Workspace
       PipelineId: $(AMLPIPELINE_ID)
       ExperimentName: $(EXPERIMENT_NAME)
