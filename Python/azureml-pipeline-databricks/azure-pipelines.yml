@@ -43,7 +43,7 @@ jobs:
         scriptLocation: inlineScript
         workingDirectory: Python/azureml-pipeline-databricks/azureml
         inlineScript: |
-          set -eux  # fail on error
+          set -eu  # fail on error
           az extension add -n azure-cli-ml
           az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
           az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
