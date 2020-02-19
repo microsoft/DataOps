@@ -227,7 +227,7 @@ def main():
     training_dataprep_step = DatabricksStep(
         name="FeatureEngineering",
         inputs=[training_data_input],
-        outputs=[feature_eng_output],
+    #    outputs=[feature_eng_output],
         spark_version=DATABRICKS_RUNTIME_VERSION,
         instance_pool_id=instance_pool_id,
         num_workers=3,
