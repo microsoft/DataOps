@@ -10,6 +10,7 @@ from azureml.core.compute import DatabricksCompute, ComputeTarget
 from azureml.core.datastore import Datastore
 from azureml.data.data_reference import DataReference
 from azure.mgmt.storage import StorageManagementClient
+from azureml.core.authentication import ServicePrincipalAuthentication
 
 
 DATABRICKS_RUNTIME_VERSION = "6.2.x-scala2.11"
@@ -125,19 +126,35 @@ def main():
 
     # Get Azure machine learning workspace
     try:
-        aml_workspace = Run.get_context(allow_offline=False).experiment.workspace
+        aml_run = Run.get_context(allow_offline=False)
     except:
+        aml_run = None
+
+    if aml_run:
+        run_ws = aml_run.experiment.workspace
+        vault = run_ws.get_default_keyvault()
+        tenant_id = vault.get_secret("TenantId")
+        client_id = vault.get_secret("ClientId")
+        client_secret = vault.get_secret("ClientSecret")
+        auth = ServicePrincipalAuthentication(
+            tenant_id=tenant_id,
+            service_principal_id=client_id,
+            service_principal_password=client_secret)
+        aml_workspace = Workspace(run_ws.subscription_id, run_ws.resource_group, run_ws.name, auth=auth)
+    else:
         aml_workspace = Workspace.from_config()
+
+
     print(aml_workspace)
 
     # Generate Databricks credentials, see https://aka.ms/databricks-aad
     dbricks_region = aml_workspace.location
     dbricks_api = f"https://{dbricks_region}.azuredatabricks.net/api/2.0"
 
-    authority_host_uri = 'https://login.microsoftonline.com'
-    authority_uri = authority_host_uri + '/' + aml_workspace.get_details()["identityTenantId"]
-    context = adal.AuthenticationContext(authority_uri)
     vault = aml_workspace.get_default_keyvault()
+    authority_host_uri = 'https://login.microsoftonline.com'
+    authority_uri = authority_host_uri + '/' + vault.get_secret("TenantId")
+    context = adal.AuthenticationContext(authority_uri)
     client_id = vault.get_secret("ClientId")
     client_secret = vault.get_secret("ClientSecret")
 
