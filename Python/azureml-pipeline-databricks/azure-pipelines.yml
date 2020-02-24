@@ -46,6 +46,7 @@ jobs:
         inlineScript: |
           set -eu  # fail on error
           set -x  # verbose
+          az extension add -n azure-cli-ml
           az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
           az ml run submit-script -e $EXPERIMENT_NAME-ci -c aml_config/build_ml_pipeline.yaml run_tests.py
 
@@ -59,8 +60,6 @@ jobs:
         inlineScript: |
           set -eu  # fail on error
           set -x  # verbose
-          az extension add -n azure-cli-ml
-          az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
           az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
           az ml run submit-script -e $EXPERIMENT_NAME-ci -c build_ml_pipeline.yaml -t run_info.json build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME --build_id $BUILD_BUILDID
           run_id=$(jq -r .run_id run_info.json)
