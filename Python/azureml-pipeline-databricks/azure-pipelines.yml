@@ -35,6 +35,20 @@ jobs:
     AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['TerraformOutputs.aml_workspace_name'] ]
     DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['TerraformOutputs.databricks_workspace_name'] ]
   steps:
+
+    - task: AzureCLI@1
+      name: Tests
+      displayName: Tests
+      inputs:
+        azureSubscription: DataOpsML Azure DevOps ML Model CI/CD pipeline
+        scriptLocation: inlineScript
+        workingDirectory: Python/azureml-pipeline-databricks/azureml
+        inlineScript: |
+          set -eu  # fail on error
+          set -x  # verbose
+          az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
+          az ml run submit-script -e $EXPERIMENT_NAME-ci -c aml_config/build_ml_pipeline.yaml run_tests.py
+
     - task: AzureCLI@1
       name: TrainPipeline
       displayName: Build train pipeline
