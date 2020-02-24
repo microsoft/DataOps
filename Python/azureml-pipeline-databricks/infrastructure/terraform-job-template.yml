@@ -2,53 +2,26 @@ parameters:
   environment: test
   TerraformArguments: ''
   TerraformEnvVariables:
-  TerraformVersion: 0.12.20
-  TerraformBackendServiceConnection: DataOpsML Azure DevOps Terraform pipeline
-  TerraformEnvironmentServiceConnection: DataOpsML Azure DevOps Terraform pipeline
-  TerraformBackendResourceGroup: terraform
-  TerraformBackendStorageAccount: dataopsterraform
-  TerraformBackendStorageContainer: terraformstate
 
 jobs:
 
 - job: Terraform
   displayName: Terraform
+  # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
+  condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
+  pool:
+    vmImage: ubuntu-latest
   steps:
 
-  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
-    displayName: Install Terraform
-    inputs:
-      terraformVersion: ${{ parameters.TerraformVersion }}
-
-  - task: ms-devlabs.custom-terraform-tasks.custom-terraform-release-task.TerraformTaskV1@0
-    displayName: Terraform init
-    inputs:
-      workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
-      backendServiceArm: ${{ parameters.TerraformBackendServiceConnection }}
-      backendAzureRmResourceGroupName: ${{ parameters.TerraformBackendResourceGroup }}
-      backendAzureRmStorageAccountName: ${{ parameters.TerraformBackendStorageAccount }}
-      backendAzureRmContainerName: ${{ parameters.TerraformBackendStorageContainer }}
-      backendAzureRmKey: ${{ parameters.environment }}.tfstate
-
-  - task: AzureCLI@1
-    displayName: Get ARM credentials for Terraform
-    inputs:
-      azureSubscription: ${{ parameters.TerraformEnvironmentServiceConnection }}
-      scriptLocation: inlineScript
-      inlineScript: |
-        set -eu
-        subscriptionId=$(az account show --query id -o tsv)
-        echo "##vso[task.setvariable variable=ARM_CLIENT_ID]$servicePrincipalId"
-        echo "##vso[task.setvariable variable=ARM_CLIENT_SECRET;issecret=true]$servicePrincipalKey"
-        echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID]$subscriptionId"
-        echo "##vso[task.setvariable variable=ARM_TENANT_ID]$tenantId"
-      addSpnToEnvironment: true
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformDirectory: infrastructure/terraform
+      environment: ${{ parameters.environment }}
 
   # Using bash instead of Terraform extension because of following issues:
   # - https://github.com/microsoft/azure-pipelines-extensions/issues/748
   # - https://github.com/microsoft/azure-pipelines-extensions/issues/725
   # - https://github.com/microsoft/azure-pipelines-extensions/issues/747
-
   - bash: |
       set -eu
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
@@ -58,13 +31,39 @@ jobs:
     env:
       ${{ parameters.TerraformEnvVariables }}
 
+- job: ReadTerraform
+  dependsOn: Apply
+  condition: always()
+  displayName: Read outputs
+  pool:
+    vmImage: ubuntu-latest
+  steps:
+
+  - bash: |
+      cp infrastructure/terraform_backend/* infrastructure/terraform
+    displayName: Configure backend
+
+  - template: terraform-init-template.yml
+    parameters:
+      TerraformDirectory: infrastructure/terraform
+      environment: ${{ parameters.environment }}
+
   - bash: |
       set -eu
+
+      echo "Setting job variables from Terraform outputs:"
+      terraform output -json | jq -r '
+        . as $in
+        | keys[]
+        | ["- " + .]
+        | @tsv'
+
       terraform output -json | jq -r '
         . as $in
         | keys[]
         | ["##vso[task.setvariable variable=" + . + ";isOutput=true;isSecret=" + ($in[.].sensitive | tostring) + "]" + ($in[.].value | tostring)]
         | @tsv'
-    name: TerraformOutputs
-    displayName: Export terraform outputs
+
+    name: Outputs
+    displayName: Read Terraform outputs
     workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform

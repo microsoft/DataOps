@@ -1,0 +1,51 @@
+parameters:
+  environment: test
+  TerraformVersion: 0.12.21
+  TerraformBackendServiceConnection: DataOpsML Azure DevOps Terraform pipeline
+  TerraformEnvironmentServiceConnection: DataOpsML Azure DevOps Terraform pipeline
+  TerraformBackendResourceGroup: terraform
+  TerraformBackendStorageAccount: dataopsterraform
+  TerraformBackendStorageContainer: terraformstate
+
+steps:
+
+- task: ms-devlabs.custom-terraform-tasks.custom-terraform-installer-task.TerraformInstaller@0
+  displayName: Install Terraform
+  inputs:
+    terraformVersion: ${{ parameters.TerraformVersion }}
+
+- task: AzureCLI@1
+  displayName: Terraform credentials
+  inputs:
+    azureSubscription: ${{ parameters.TerraformEnvironmentServiceConnection }}
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -eu
+      subscriptionId=$(az account show --query id -o tsv)
+      echo "##vso[task.setvariable variable=ARM_CLIENT_ID]$servicePrincipalId"
+      echo "##vso[task.setvariable variable=ARM_CLIENT_SECRET;issecret=true]$servicePrincipalKey"
+      echo "##vso[task.setvariable variable=ARM_SUBSCRIPTION_ID]$subscriptionId"
+      echo "##vso[task.setvariable variable=ARM_TENANT_ID]$tenantId"
+    addSpnToEnvironment: true
+
+# Using bash instead of Terraform extension because of following issue:
+# - https://github.com/microsoft/azure-pipelines-extensions/issues/738
+- task: AzureCLI@1
+  displayName: Terraform init
+  inputs:
+    azureSubscription: ${{ parameters.TerraformBackendServiceConnection }}
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -eux  # fail on error
+      subscriptionId=$(az account show --query id -o tsv)
+      terraform init \
+        -backend-config=storage_account_name=${{ parameters.TerraformBackendStorageAccount }} \
+        -backend-config=container_name=${{ parameters.TerraformBackendStorageContainer }} \
+        -backend-config=key=${{ parameters.environment }}.tfstate \
+        -backend-config=resource_group_name=${{ parameters.TerraformBackendResourceGroup }} \
+        -backend-config=subscription_id=$subscriptionId \
+        -backend-config=tenant_id=$tenantId \
+        -backend-config=client_id=$servicePrincipalId \
+        -backend-config=client_secret="$servicePrincipalKey"
+    workingDirectory: ${{ parameters.TerraformDirectory }}
+    addSpnToEnvironment: true
