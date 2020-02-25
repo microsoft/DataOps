@@ -36,16 +36,16 @@ stages:
         TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
    
   - job: Build_Pipeline
-    dependsOn: Terraform
+    dependsOn: ReadTerraform
     displayName: Build ML Training Pipeline
     container: mlops
     timeoutInMinutes: 0
     variables:
-      SUBSCRIPTION_ID: $[ dependencies.Terraform.outputs['Outputs.subscription_id'] ]
-      RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Outputs.resource_group_name'] ]
-      AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.aml_workspace_name'] ]
-      DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.databricks_workspace_name'] ]
-      TRAINING_DATA_ACCOUNT_NAME: $[ dependencies.Terraform.outputs['Outputs.training_data_account_name'] ]
+      SUBSCRIPTION_ID: $[ dependencies.ReadTerraform.outputs['Outputs.subscription_id'] ]
+      RESOURCE_GROUP: $[ dependencies.ReadTerraform.outputs['Outputs.resource_group_name'] ]
+      AML_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.aml_workspace_name'] ]
+      DATABRICKS_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.databricks_workspace_name'] ]
+      TRAINING_DATA_ACCOUNT_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.training_data_account_name'] ]
    
     steps:
 #   - script: |   
@@ -96,9 +96,9 @@ stages:
     displayName: "Trigger ML Training Pipeline"
     pool: server
     variables:
-      RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Outputs.resource_group_name'] ]
-      AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.aml_workspace_name'] ]
-      DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.databricks_workspace_name'] ]
+      RESOURCE_GROUP: $[ dependencies.ReadTerraform.outputs['Outputs.resource_group_name'] ]
+      AML_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.aml_workspace_name'] ]
+      DATABRICKS_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.databricks_workspace_name'] ]
       AMLPIPELINE_ID: $[ dependencies.Build_Pipeline.outputs['TrainPipeline.AMLPIPELINE_ID'] ]
     steps:
     - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
