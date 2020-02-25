@@ -3,8 +3,8 @@ parameters:
   TerraformVersion: 0.12.21
   TerraformBackendServiceConnection: DataOpsML Azure DevOps Terraform pipeline
   TerraformEnvironmentServiceConnection: DataOpsML Azure DevOps Terraform pipeline
-  TerraformBackendResourceGroup: terraform
-  TerraformBackendStorageAccount: dataopsterraform
+  TerraformBackendResourceGroup: $(TERRAFORM_BACKEND_RG)
+  TerraformBackendStorageAccount: $(TERRAFORM_BACKEND_STORAGE)
   TerraformBackendStorageContainer: terraformstate
 
 steps:

@@ -1,12 +1,6 @@
 # Databricks notebook source
 # This notebook processed the training dataset (imported by Data Factory)
-# and computes a cleaned dataset with additional features such as city.
-from pyspark.sql.types import StructType, StructField
-from pyspark.sql.types import DoubleType, IntegerType, TimestampType, StringType
-from pyspark.sql.functions import pandas_udf, PandasUDFType
-import pyspark.sql.functions as F
-import pandas as pd
-import json
+# and computes a cleaned dataset with additional feature
 
 # COMMAND ----------
 
@@ -49,18 +43,10 @@ dbutils.widgets.text(
 
 # COMMAND ----------
 
-# Install modules for geospatial computation
-dbutils.library.installPyPI("shapely")
-dbutils.library.installPyPI("geopandas")
-from shapely import wkt
-import geopandas
-
-# COMMAND ----------
-
 # Connect to Azure ML
 dbutils.library.installPyPI(
     "azureml-sdk",
-    version="1.0.79",
+    version="1.0.85",
     extras="databricks")
 from azureml.core import Run
 # In an Azure ML run, settings get imported from passed --AZUREML_* parameters
@@ -100,6 +86,6 @@ rawdata = (
 # Write data to CSV
 
 dest_path_csv = dbutils.widgets.get('feature_engineered')
-    enriched_data.toPandas().to_csv("/tmp/output.csv", index=False)
-    csv_file = "%s/engineered.csv" % (dest_path_csv)
-    assert dbutils.fs.cp("file:/tmp/output.csv", csv_file)
+enriched_data.toPandas().to_csv("/tmp/output.csv", index=False)
+csv_file = "%s/engineered.csv" % (dest_path_csv)
+assert dbutils.fs.cp("file:/tmp/output.csv", csv_file)

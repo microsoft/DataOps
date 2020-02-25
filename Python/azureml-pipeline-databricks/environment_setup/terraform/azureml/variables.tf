@@ -26,13 +26,3 @@ variable "devops_mlpipeline_sp_object_id" {
   type    = string
   description = "Service principal object ID for the Azure DevOps ML Model CI/CD pipeline service connection"
 }
-
-variable "aml_run_sp_client_id" {
-  type    = string
-  description = "Service principal client ID for the Azure DevOps ML Model CI/CD pipeline service connection"
-}
-
-variable "aml_run_sp_client_secret" {
-  type    = string
-  description = "Service principal client secret for the Azure DevOps ML Model CI/CD pipeline service connection"
-}

@@ -7,17 +7,21 @@ output "resource_group_name" {
 }
 
 output "aml_workspace_id" {
-    value = module.azureml.id
+  value = module.azureml.id
 }
 
 output "aml_workspace_name" {
-    value = module.azureml.name
+  value = module.azureml.name
 }
 
 output "databricks_workspace_name" {
-    value = module.databricks.name
+  value = module.databricks.name
 }
 
 output "databricks_location" {
-    value = module.databricks.location
+  value = module.databricks.location
+}
+
+output "training_data_account_name" {
+  value = module.training-data.account_name
 }

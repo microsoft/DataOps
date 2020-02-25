@@ -1,0 +1,32 @@
+# Pipeline that builds and pushes the microsoft/mlopspython image.
+resources:
+- repo: self
+
+pool: 
+  vmImage: 'ubuntu-latest'
+
+trigger:
+  branches:
+    include:
+    - master
+
+  paths:
+    include:
+    - environment_setup/Dockerfile
+
+variables:
+  containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
+  imageName: $[coalesce(variables['agentImageName'], 'azureml-pipeline-databricks')]  
+
+steps:
+  - task: Docker@2
+    displayName: Build and Push
+    inputs:
+      command: buildAndPush
+      containerRegistry: '$(containerRegistry)'
+      repository: '$(imageName)'
+      tags: |
+       $(Build.BuildNumber)
+       latest
+      buildContext: '$(Build.SourcesDirectory)' 
+      dockerFile: '$(Build.SourcesDirectory)/environment_setup/Dockerfile'

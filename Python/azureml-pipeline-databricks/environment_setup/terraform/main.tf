@@ -6,7 +6,7 @@
 # Resource Group
 
 resource "azurerm_resource_group" "main" {
-  name     = "rg-${var.appname}-${var.environment}-main"
+  name   = "rg-${var.appname}-${var.environment}-main"
   location = var.location
 }
 
@@ -19,8 +19,6 @@ module "azureml" {
   resource_group_name = azurerm_resource_group.main.name
   object_id = data.azurerm_client_config.current.object_id
   devops_mlpipeline_sp_object_id = var.devops_mlpipeline_sp_object_id
-  aml_run_sp_client_id = var.aml_run_sp_client_id
-  aml_run_sp_client_secret = var.aml_run_sp_client_secret
 }
 
 module "training-data" {

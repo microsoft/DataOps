@@ -32,7 +32,7 @@ jobs:
       ${{ parameters.TerraformEnvVariables }}
 
 - job: ReadTerraform
-  dependsOn: Apply
+  dependsOn: Terraform
   condition: always()
   displayName: Read outputs
   pool:

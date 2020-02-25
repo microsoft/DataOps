@@ -5,10 +5,6 @@ dependencies:
   # The python interpreter version.
 - python=3.7.5
 
-#- numpy=1.18.1
-#- pandas=1.0.0
-#- scikit-learn=0.22.1
-
 - pip=20.0.2
 - pip:
 
@@ -17,6 +13,7 @@ dependencies:
 
   # Additional pip dependencies for the CI environment.
   - databricks-client==0.0.2
+  - databricks-test==0.0.1
   - adal==1.2.2
   - pytest==5.3.1
   - pytest-cov==2.8.1
@@ -26,3 +23,7 @@ dependencies:
   - flake8_formatter_junit_xml==0.0.6
   - azure-cli==2.0.77
   - tox==3.14.3
+  # Runtime modules for Spark - match Databricks runtime 6.2
+  - pyspark==2.4.4
+  - pandas==0.24.2
+  - pyarrow==0.13.0

@@ -1,3 +1,9 @@
+resources:
+  containers:
+  - container: mlops
+    endpoint: acrconnection
+    image: azureml-pipeline-databricks
+
 pr: none
 trigger:
   branches:
@@ -5,83 +11,99 @@ trigger:
     - master
   paths:
     include:
-    - infrastructure/
+    - Python/azureml-pipeline-databricks/
 
 variables:
 - group: terraform
 - name: EXPERIMENT_NAME
-  value: ci
+  value: azureml-pipeline-databricks
+- name: ARM_SVC_CONNECTION
+  value: DataOpsML Azure DevOps ML Model CI/CD pipeline
+- name: WORKSPACE_SVC_CONNECTION
+  value: DataOpsML Azure DevOps Azure ML Workspace
 
 pool:
   vmImage: ubuntu-latest
 
-jobs:
-- template: infrastructure/terraform-job-template.yml
-  parameters:
-    environment: test
-    TerraformBackendResourceGroup: $(TERRAFORM_BACKEND_RG)
-    TerraformBackendStorageAccount: $(TERRAFORM_BACKEND_STORAGE)
-    TerraformEnvVariables:
-      TF_VAR_location: $(LOCATION)
-      TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
-      TF_VAR_aml_run_sp_client_id: $(AML_RUN_SP_CLIENT_ID)
-      TF_VAR_aml_run_sp_client_secret: $(AML_RUN_SP_CLIENT_SECRET)
-
-- job: Build_Pipeline
-  dependsOn: Terraform
-  displayName: Build ML Training Pipeline
-  variables:
-    RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Outputs.resource_group_name'] ]
-    AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.aml_workspace_name'] ]
-    DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.databricks_workspace_name'] ]
-  steps:
-
-    - task: AzureCLI@1
-      name: Tests
-      displayName: Tests
+stages:
+- stage: 'Model_CI'
+  displayName: 'Model CI'
+  jobs:
+  - template: infrastructure/terraform-job-template.yml
+    parameters:
+      TerraformEnvVariables:
+        TF_VAR_location: $(LOCATION)
+        TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
+   
+  - job: Build_Pipeline
+    dependsOn: Terraform
+    displayName: Build ML Training Pipeline
+    container: mlops
+    timeoutInMinutes: 0
+    variables:
+      SUBSCRIPTION_ID: $[ dependencies.Terraform.outputs['Outputs.subscription_id'] ]
+      RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Outputs.resource_group_name'] ]
+      AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.aml_workspace_name'] ]
+      DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.databricks_workspace_name'] ]
+      TRAINING_DATA_ACCOUNT_NAME: $[ dependencies.Terraform.outputs['Outputs.training_data_account_name'] ]
+   
+    steps:
+#   - script: |   
+#      flake8 --output-file=lint-testresults.xml --format junit-xml
+#     displayName: 'Run lint tests'
+#     workingDirectory: Python/azureml-pipeline-databricks
+#   
+#   - script: |   
+#      python -m pytest . --cov=azureml --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
+#     condition: succeededOrFailed()
+#     displayName: 'Run unit tests'
+#     workingDirectory: Python/azureml-pipeline-databricks
+    
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
       inputs:
-        azureSubscription: DataOpsML Azure DevOps ML Model CI/CD pipeline
-        scriptLocation: inlineScript
-        workingDirectory: Python/azureml-pipeline-databricks/azureml
-        inlineScript: |
-          set -eu  # fail on error
-          set -x  # verbose
-          az extension add -n azure-cli-ml
-          az ml folder attach -g $RESOURCE_GROUP -w $AML_WORKSPACE_NAME
-          az ml run submit-script -e $EXPERIMENT_NAME-ci -c aml_config/build_ml_pipeline.yaml run_tests.py
-
+        testResultsFiles: '**/*-testresults.xml'
+        testRunTitle: 'Linting & Unit tests'
+        failTaskOnFailedTests: true
+      displayName: 'Publish test results'
+    
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish coverage report'
+      condition: succeededOrFailed()
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '**/coverage.xml'
+        reportDirectory: '**/htmlcov'
+        failIfCoverageEmpty: true
+   
     - task: AzureCLI@1
       name: TrainPipeline
-      displayName: Build train pipeline
       inputs:
-        azureSubscription: DataOpsML Azure DevOps ML Model CI/CD pipeline
+        azureSubscription: '$(ARM_SVC_CONNECTION)'
         scriptLocation: inlineScript
         workingDirectory: Python/azureml-pipeline-databricks/azureml
         inlineScript: |
-          set -eu  # fail on error
-          set -x  # verbose
-          az ml datastore attach-blob -a stmyappdataopstrtest -c trainingdata -n trainingdata
-          az ml run submit-script -e $EXPERIMENT_NAME-ci -c build_ml_pipeline.yaml -t run_info.json build_ml_pipeline.py --databricks_workspace_name $DATABRICKS_WORKSPACE_NAME --build_id $BUILD_BUILDID
-          run_id=$(jq -r .run_id run_info.json)
-          set +x  # non-verbose
-          echo -n "##vso[task.setvariable variable=AMLPIPELINE_ID;isOutput=true]"
-          az ml run show --run $run_id -e $EXPERIMENT_NAME-ci --query tags.PipelineId -o tsv
+          set -e # fail on error
 
-- job: Run_ML_Pipeline
-  dependsOn:
-  - Terraform
-  - Build_Pipeline
-  displayName: Trigger ML Training Pipeline
-  pool: server
-  variables:
-    RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Outputs.resource_group_name'] ]
-    AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.aml_workspace_name'] ]
-    DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.databricks_workspace_name'] ]
-    AMLPIPELINE_ID: $[ dependencies.Build_Pipeline.outputs['TrainPipeline.AMLPIPELINE_ID'] ]
-  steps:
-  - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
-    displayName: Invoke ML pipeline
-    inputs:
-      azureSubscription: DataOpsML Azure DevOps Azure ML Workspace
-      PipelineId: $(AMLPIPELINE_ID)
-      ExperimentName: $(EXPERIMENT_NAME)
+          # Set up environment and build AML pipeline.
+          # Also sets the AMLPIPELINE_ID job variable.
+          python -m ml_service.build_ml_pipeline
+
+      displayName: 'Publish Azure Machine Learning Pipeline'
+
+  - job: "Run_ML_Pipeline"
+    dependsOn: Build_Pipeline
+    displayName: "Trigger ML Training Pipeline"
+    pool: server
+    variables:
+      RESOURCE_GROUP: $[ dependencies.Terraform.outputs['Outputs.resource_group_name'] ]
+      AML_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.aml_workspace_name'] ]
+      DATABRICKS_WORKSPACE_NAME: $[ dependencies.Terraform.outputs['Outputs.databricks_workspace_name'] ]
+      AMLPIPELINE_ID: $[ dependencies.Build_Pipeline.outputs['TrainPipeline.AMLPIPELINE_ID'] ]
+    steps:
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke ML pipeline'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        PipelineId: '$(AMLPIPELINE_ID)'
+        ExperimentName: '$(EXPERIMENT_NAME)'
