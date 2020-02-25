@@ -27,7 +27,7 @@ jobs:
       export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
       terraform apply -input=false -auto-approve -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
     displayName: Terraform apply
-    workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
+    workingDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
     env:
       ${{ parameters.TerraformEnvVariables }}
 
@@ -62,4 +62,4 @@ jobs:
 
     name: Outputs
     displayName: Read Terraform outputs
-    workingDirectory: Python/azureml-pipeline-databricks/infrastructure/terraform
+    workingDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
