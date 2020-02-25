@@ -39,11 +39,6 @@ jobs:
     vmImage: ubuntu-latest
   steps:
 
-  - bash: |
-      cp environment_setup/terraform_backend/* environment_setup/terraform
-    displayName: Configure backend
-    workingDirectory: Python/azureml-pipeline-databricks
-
   - template: terraform-init-template.yml
     parameters:
       TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
