@@ -5,7 +5,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name='databricks_test',
-    version='0.0.1',
+    version='0.0.2',
     author="Alexandre Gattiker",
     author_email="algattik@microsoft.com",
     description="Unit testing and mocking for Databricks",
