@@ -29,7 +29,7 @@ stages:
 - stage: 'Model_CI'
   displayName: 'Model CI'
   jobs:
-  - template: infrastructure/terraform-job-template.yml
+  - template: environment_setup/terraform-job-template.yml
     parameters:
       TerraformEnvVariables:
         TF_VAR_location: $(LOCATION)

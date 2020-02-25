@@ -15,7 +15,7 @@ jobs:
 
   - template: terraform-init-template.yml
     parameters:
-      TerraformDirectory: infrastructure/terraform
+      TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
       environment: ${{ parameters.environment }}
 
   # Using bash instead of Terraform extension because of following issues:
@@ -40,12 +40,13 @@ jobs:
   steps:
 
   - bash: |
-      cp infrastructure/terraform_backend/* infrastructure/terraform
+      cp environment_setup/terraform_backend/* environment_setup/terraform
     displayName: Configure backend
+    workingDirectory: Python/azureml-pipeline-databricks
 
   - template: terraform-init-template.yml
     parameters:
-      TerraformDirectory: infrastructure/terraform
+      TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
       environment: ${{ parameters.environment }}
 
   - bash: |
