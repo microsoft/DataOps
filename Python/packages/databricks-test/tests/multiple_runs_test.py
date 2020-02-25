@@ -1,8 +1,6 @@
-import pandas as pd
 import databricks_test
 from tempfile import NamedTemporaryFile
 import uuid
-import os
 
 
 def run_notebook(run_num, dbrickstest):
