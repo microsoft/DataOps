@@ -59,22 +59,22 @@ stages:
 #     displayName: 'Run unit tests'
 #     workingDirectory: Python/azureml-pipeline-databricks
     
-    - task: PublishTestResults@2
-      condition: succeededOrFailed()
-      inputs:
-        testResultsFiles: '**/*-testresults.xml'
-        testRunTitle: 'Linting & Unit tests'
-        failTaskOnFailedTests: true
-      displayName: 'Publish test results'
+#    - task: PublishTestResults@2
+#      condition: succeededOrFailed()
+#      inputs:
+#        testResultsFiles: '**/*-testresults.xml'
+#        testRunTitle: 'Linting & Unit tests'
+#        failTaskOnFailedTests: true
+#      displayName: 'Publish test results'
     
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish coverage report'
-      condition: succeededOrFailed()
-      inputs:
-        codeCoverageTool: Cobertura
-        summaryFileLocation: '**/coverage.xml'
-        reportDirectory: '**/htmlcov'
-        failIfCoverageEmpty: true
+#    - task: PublishCodeCoverageResults@1
+#      displayName: 'Publish coverage report'
+#      condition: succeededOrFailed()
+#      inputs:
+#        codeCoverageTool: Cobertura
+#        summaryFileLocation: '**/coverage.xml'
+#        reportDirectory: '**/htmlcov'
+#        failIfCoverageEmpty: true
    
     - task: AzureCLI@1
       name: TrainPipeline
