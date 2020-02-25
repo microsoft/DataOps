@@ -3,9 +3,6 @@ FROM conda/miniconda3
 ARG SPARK_VERSION=2.4.3
 ARG HADOOP_VERSION=2.7
 
-COPY azureml/ci_dependencies.yml /setup/
-
-
 # Install Spark runtime
 WORKDIR /
 RUN apt-get update \
@@ -19,11 +16,13 @@ RUN apt-get update \
 
 ENV SPARK_HOME /spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}
 
+COPY azureml/ci_dependencies.yml /setup/
+
 # activate Conda environment
-ENV PATH /usr/local/envs/mlopspython_ci/bin:$PATH
+ENV PATH /usr/local/envs/datops_ci/bin:$PATH
 
 RUN conda update -n base -c defaults conda && \
     conda env create -f /setup/ci_dependencies.yml && \
-    /bin/bash -c "source activate mlopspython_ci" && \
+    /bin/bash -c "source activate datops_ci" && \
     az --version && \
-    chmod -R 777 /usr/local/envs/mlopspython_ci/lib
+    chmod -R 777 /usr/local/envs/datops_ci/lib
