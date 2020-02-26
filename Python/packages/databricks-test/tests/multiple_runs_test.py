@@ -32,3 +32,7 @@ def test_multiple_runs():
 
     with databricks_test.session() as dbrickstest:
         run_notebook(3, dbrickstest)
+
+def test_multiple_runs2():
+    with databricks_test.session() as dbrickstest:
+        run_notebook(4, dbrickstest)
