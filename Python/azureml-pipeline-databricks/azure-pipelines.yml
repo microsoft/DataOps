@@ -81,7 +81,7 @@ stages:
       inputs:
         azureSubscription: '$(ARM_SVC_CONNECTION)'
         scriptLocation: inlineScript
-        workingDirectory: Python/azureml-pipeline-databricks/azureml
+        workingDirectory: Python/azureml-pipeline-databricks
         inlineScript: |
           set -e # fail on error
 
