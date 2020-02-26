@@ -23,8 +23,10 @@ dependencies:
   - python-dotenv==0.10.3
   - flake8==3.7.9
   - flake8_formatter_junit_xml==0.0.6
-  - azure-cli==2.0.77
+  - azure-cli==2.1.0
   - tox==3.14.3
+  # required for azure.common.credentials.get_azure_cli_credentials
+  - azure-core==1.2.2
   # Runtime modules for Spark - match Databricks runtime 6.2
   - pyspark==2.4.4
   - pandas==0.24.2
