@@ -240,7 +240,7 @@ def main():
     # for AML Pipeline task in next job
     print("Setting Azure DevOps variable")
     print(f"##vso[task.setvariable variable=AMLPIPELINE_ID;isOutput=true]"
-          "{published_pipeline.id}")
+          f"{published_pipeline.id}")
 
 
 if __name__ == "__main__":
