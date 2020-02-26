@@ -8,10 +8,7 @@ def test_feature_engineering(mocker):
     mocker.patch("azureml.core.Run")
 
     with databricks_test.session() as dbrickstest, \
-            TemporaryDirectory() as csv_dir:
-
-        in_file = f"{csv_dir}/input"
-        out_dir = f"{csv_dir}/output"
+            TemporaryDirectory() as out_dir:
 
         # Provide input and output location as widgets to notebook
         switcher = {
