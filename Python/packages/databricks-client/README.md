@@ -39,10 +39,16 @@ If using this module as part of a provisioning job, you need to call `client.ens
 
 When the first user logs it to a new Databricks workspace, workspace provisioning is triggered,
 and the API is not available until that job has completed (that usually takes under a minute,
-but could take longer depending on the network configuration).
+but could take longer depending on the network configuration). In that case you would get an
+error such as the following when calling the API:
+
+```
+"Succeeded{"error_code":"INVALID_PARAMETER_VALUE","message":"Unknown worker environment WorkerEnvId(workerenv-4312344789891641)"}
+```
 
 The method `client.ensure_available(url="instance-pools/list", retries=100, delay_seconds=6)`
-attempts connecting to the provided URL and retries as long as the workspace is in provisioning
+prevents this error by attempting to
+connect to the provided URL and retries as long as the workspace is in provisioning
 state, or until the given number of retries has elapsed.
 
 ## Usage with Azure Active Directory
