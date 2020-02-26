@@ -80,12 +80,16 @@ rawdata = (
     .load(dbutils.widgets.get('training'))
 )
 
+# COMMAND ----------
+
+# Basic data cleanup - remove rows with missing data
+cleandata = rawdata.na.drop()
 
 # COMMAND ----------
 
 # Write data to CSV
 
 dest_path_csv = dbutils.widgets.get('feature_engineered')
-rawdata.toPandas().to_csv("/tmp/output.csv", index=False)
+cleandata.toPandas().to_csv("/tmp/output.csv", index=False)
 csv_file = "%s/engineered.csv" % (dest_path_csv)
 assert dbutils.fs.cp("file:/tmp/output.csv", csv_file)

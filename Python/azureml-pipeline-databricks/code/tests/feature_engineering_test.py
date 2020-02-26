@@ -12,7 +12,7 @@ def test_feature_engineering(mocker):
 
         # Provide input and output location as widgets to notebook
         switcher = {
-            "training": "code/tests/feature_engineering_input.csv",
+            "training": "code/tests/diabetes_missing_values.csv",
             "feature_engineered": out_dir,
         }
         dbrickstest.dbutils.widgets.get = lambda x: switcher.get(x, "")
