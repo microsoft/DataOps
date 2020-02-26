@@ -117,6 +117,11 @@ def main():
 
     # Get Azure machine learning workspace
     aml_workspace = Workspace.from_config()
+    aml_workspace = Workspace.get(
+        name=os.environ['AML_WORKSPACE_NAME'],
+        subscription_id=os.environ['SUBSCRIPTION_ID'],
+        resource_group=os.environ['RESOURCE_GROUP'],
+    )
     print(aml_workspace)
 
     # Generate Databricks credentials, see https://aka.ms/databricks-aad
