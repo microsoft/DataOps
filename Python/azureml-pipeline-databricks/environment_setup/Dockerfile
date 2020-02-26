@@ -16,7 +16,7 @@ RUN apt-get update \
 
 ENV SPARK_HOME /spark-${SPARK_VERSION}-bin-hadoop${HADOOP_VERSION}
 
-COPY azureml/ci_dependencies.yml /setup/
+COPY ci_dependencies.yml /setup/
 
 # activate Conda environment
 ENV PATH /usr/local/envs/dataops_ci/bin:$PATH

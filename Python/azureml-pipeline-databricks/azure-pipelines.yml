@@ -54,7 +54,7 @@ stages:
 #     workingDirectory: Python/azureml-pipeline-databricks
 #   
 #   - script: |   
-#      python -m pytest . --cov=azureml --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
+#      python -m pytest . --cov=. --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
 #     condition: succeededOrFailed()
 #     displayName: 'Run unit tests'
 #     workingDirectory: Python/azureml-pipeline-databricks
