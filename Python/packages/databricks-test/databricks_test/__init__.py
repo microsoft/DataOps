@@ -104,11 +104,14 @@ class Session():
                     importlib.import_module(script)
                 else:
                     # If script was already imported, reload it to rerun it
-                    importlib.reload(sys.modules[script])
+
                     # Per importlib docs: When a module is reloaded, its
                     # dictionary (global variables) is retained.
                     # Delete dbutils to ensure inject_variables gets called.
                     del sys.modules[script].dbutils
+
+                    # Reload the notebook module
+                    importlib.reload(sys.modules[script])
         except WorkflowInterrupted:
             pass
 
