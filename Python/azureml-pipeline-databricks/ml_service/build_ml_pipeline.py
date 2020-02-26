@@ -127,23 +127,10 @@ def main():
     dbricks_region = aml_workspace.location
     dbricks_api = f"https://{dbricks_region}.azuredatabricks.net/api/2.0"
 
-    vault = aml_workspace.get_default_keyvault()
-    authority_host_uri = 'https://login.microsoftonline.com'
-    authority_uri = authority_host_uri + '/' + vault.get_secret("TenantId")
-    context = adal.AuthenticationContext(authority_uri)
-    client_id = vault.get_secret("ClientId")
-    client_secret = vault.get_secret("ClientSecret")
-
-    def token_callback(resource):
-        return context.acquire_token_with_client_credentials(
-            resource, client_id, client_secret)["accessToken"]
-
     dbricks_client = databricks_client.create(dbricks_api)
     dbricks_client.auth_azuread(
         resource_group=aml_workspace.resource_group,
-        workspace_name=databricks_workspace_name,
-        subscription_id=aml_workspace.subscription_id,
-        token_callback=token_callback)
+        workspace_name=databricks_workspace_name)
 
     # Attach Databricks as Azure ML training compute
     dbricks_compute_name = "databricks"
