@@ -86,6 +86,6 @@ rawdata = (
 # Write data to CSV
 
 dest_path_csv = dbutils.widgets.get('feature_engineered')
-enriched_data.toPandas().to_csv("/tmp/output.csv", index=False)
+rawdata.toPandas().to_csv("/tmp/output.csv", index=False)
 csv_file = "%s/engineered.csv" % (dest_path_csv)
 assert dbutils.fs.cp("file:/tmp/output.csv", csv_file)
