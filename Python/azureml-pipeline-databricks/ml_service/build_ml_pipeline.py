@@ -2,7 +2,6 @@ import os
 import base64
 import hashlib
 import databricks_client
-import adal
 from azureml.core import Workspace
 from azureml.pipeline.core import Pipeline, PipelineData
 from azureml.pipeline.steps import DatabricksStep

@@ -7,21 +7,15 @@ from pandas.testing import assert_frame_equal
 def test_feature_engineering(mocker):
     mocker.patch("azureml.core.Run")
 
-    # Read test input sample data
-    df = pd.read_csv("code/tests/testdata/feature_engineering/input.csv")
-
     with databricks_test.session() as dbrickstest, \
             TemporaryDirectory() as csv_dir:
 
         in_file = f"{csv_dir}/input"
         out_dir = f"{csv_dir}/output"
 
-        # Write test input sample data as parquet
-        df.to_parquet(in_file, compression='gzip')
-
         # Provide input and output location as widgets to notebook
         switcher = {
-            "training": "code/tests/testdata/feature_engineering/input.csv",
+            "training": "code/tests/feature_engineering_input.csv",
             "feature_engineered": out_dir,
         }
         dbrickstest.dbutils.widgets.get = lambda x: switcher.get(x, "")
@@ -46,6 +40,6 @@ def test_feature_engineering(mocker):
 
     # Compare produced and expected CSV files
     expectedDF = pd.read_csv(
-        "code/tests/testdata/feature_engineering/expected.csv")
+        "code/tests/feature_engineering_expected.csv")
     assert_frame_equal(
         expectedDF, resultDF, check_dtype=False, check_categorical=False)

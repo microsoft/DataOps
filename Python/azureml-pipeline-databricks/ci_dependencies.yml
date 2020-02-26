@@ -16,7 +16,6 @@ dependencies:
   # Additional pip dependencies for the CI environment.
   - databricks-client==0.0.2
   - databricks-test==0.0.1
-  - adal==1.2.2
   - pytest==5.3.1
   - pytest-cov==2.8.1
   - requests==2.22.0
