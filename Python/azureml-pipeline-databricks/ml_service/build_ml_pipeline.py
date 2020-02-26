@@ -131,6 +131,7 @@ def main():
     dbricks_client.auth_azuread(
         resource_group=aml_workspace.resource_group,
         workspace_name=databricks_workspace_name)
+    dbricks_client.ensure_available()
 
     # Attach Databricks as Azure ML training compute
     dbricks_compute_name = "databricks"
