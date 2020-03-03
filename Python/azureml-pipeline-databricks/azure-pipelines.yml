@@ -46,7 +46,7 @@ stages:
         TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
         environment: test
 
-    - template: ../infrastructure/terraform-outputs-template.yml
+    - template: environment_setup/terraform-outputs-template.yml
       parameters:
         TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
 
