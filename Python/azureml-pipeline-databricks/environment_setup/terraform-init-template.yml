@@ -1,6 +1,7 @@
 parameters:
   environment: test
   TerraformVersion: 0.12.21
+  TerraformDirectory:
   TerraformBackendServiceConnection: DataOpsML Azure DevOps Terraform pipeline
   TerraformEnvironmentServiceConnection: DataOpsML Azure DevOps Terraform pipeline
   TerraformBackendResourceGroup: $(TERRAFORM_BACKEND_RG)

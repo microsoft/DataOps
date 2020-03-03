@@ -15,7 +15,7 @@ trigger:
     - Python/azureml-pipeline-databricks/environment_setup/Dockerfile
 
 variables:
-  containerRegistry: $[coalesce(variables['acrServiceConnection'], 'acrconnection')]
+  containerRegistry: DataOpsML Azure Container Registry
   imageName: $[coalesce(variables['agentImageName'], 'azureml-pipeline-databricks')]  
 
 steps:

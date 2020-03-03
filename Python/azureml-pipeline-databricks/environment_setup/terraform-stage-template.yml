@@ -1,0 +1,34 @@
+parameters:
+  environment: test
+  TerraformArguments: ''
+  TerraformEnvVariables:
+
+stages:
+- stage: Terraform
+  pool:
+    vmImage: ubuntu-latest
+  jobs:
+
+  - job: Terraform
+    displayName: Terraform
+    # Avoid concurrent Terraform runs on PRs, which would result in failures due to exclusive lock on remote state file.
+    condition: and(succeeded(), or(eq(variables['Build.SourceBranch'], 'refs/heads/master'), variables['RUN_FLAG_TERRAFORM']))
+    steps:
+
+    - template: terraform-init-template.yml
+      parameters:
+        TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
+        environment: ${{ parameters.environment }}
+
+    # Using bash instead of Terraform extension because of following issues:
+    # - https://github.com/microsoft/azure-pipelines-extensions/issues/748
+    # - https://github.com/microsoft/azure-pipelines-extensions/issues/725
+    # - https://github.com/microsoft/azure-pipelines-extensions/issues/747
+    - bash: |
+        set -eu
+        export ARM_CLIENT_SECRET=$(ARM_CLIENT_SECRET)
+        terraform apply -input=false -auto-approve -var environment=${{ parameters.environment }} ${{ parameters.TerraformArguments }}
+      displayName: Terraform apply
+      workingDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
+      env:
+        ${{ parameters.TerraformEnvVariables }}

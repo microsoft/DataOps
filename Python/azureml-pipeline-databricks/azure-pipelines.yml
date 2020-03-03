@@ -1,7 +1,7 @@
 resources:
   containers:
   - container: mlops
-    endpoint: acrconnection
+    endpoint: DataOpsML Azure Container Registry
     image: azureml-pipeline-databricks
 
 pr: none
@@ -26,15 +26,30 @@ pool:
   vmImage: ubuntu-latest
 
 stages:
+
+- template: environment_setup/terraform-stage-template.yml
+  parameters:
+    environment: test
+    TerraformEnvVariables:
+      TF_VAR_location: $(LOCATION)
+      TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
+
 - stage: 'Model_CI'
   displayName: 'Model CI'
   jobs:
-  - template: environment_setup/terraform-job-template.yml
-    parameters:
-      TerraformEnvVariables:
-        TF_VAR_location: $(LOCATION)
-        TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
-   
+  - job: ReadTerraform
+    displayName: Use Terraform outputs
+    steps:
+
+    - template: terraform-init-template.yml
+      parameters:
+        TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
+        environment: test
+
+    - template: ../infrastructure/terraform-outputs-template.yml
+      parameters:
+        TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
+
   - job: Build_Pipeline
     dependsOn: ReadTerraform
     displayName: Build ML Training Pipeline
