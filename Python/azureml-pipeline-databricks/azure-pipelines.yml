@@ -41,7 +41,7 @@ stages:
     displayName: Use Terraform outputs
     steps:
 
-    - template: terraform-init-template.yml
+    - template: environment_setup/terraform-init-template.yml
       parameters:
         TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
         environment: test
