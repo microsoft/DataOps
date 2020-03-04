@@ -1,3 +1,5 @@
+name: terraform
+
 pr: none
 trigger: none
 
