@@ -2,10 +2,18 @@
 
 This samples automates the provisioning of an ML execution environment using Terraform, and the provisioning and execution of an Azure ML Pipeline that runs a Databricks notebook doing data engineering.
 
+* Deployment of Azure ML and Databricks infrastructure using Terraform (based on the [Terraform Azure DevOps starter sample](https://github.com/microsoft/terraform-azure-devops-starter)).
+* Provisioning of Databricks accounts and notebooks with Azure AD authentication, using the [databricks-client](https://pypi.org/project/databricks-client/) module.
+* Unit testing of Databricks notebooks with PySpark, using the [databricks-test](https://pypi.org/project/databricks-test/) module.
+* Integrating a [Databricks step](https://docs.microsoft.com/en-us/azure/machine-learning/how-to-create-your-first-pipeline#databricks) into an Azure ML pipeline.
+
 This sample is meant to be combined with [the MLOpsPython repository](https://github.com/microsoft/MLOpsPython)
 in order to add ETL / feature engineering to an ML training pipeline. The MLOpsPython repository
 contains templates for subsequent steps of an MLOps pipeline, such as ML model building,
 validation and scoring image deployment.
+
+In this sample, Databricks is used for feature engineering previously to building an ML model. A Databricks step
+can also be used for model training and model batch scoring.
 
 ## Contents
 
@@ -21,6 +29,10 @@ validation and scoring image deployment.
 | `tox.ini`               | Linting and unit test configuration.                        |
 
 ## Running the sample
+
+### Getting the code
+
+Fork this repository within GitHub, or clone it into your Azure DevOps project.
 
 ### Create an Azure DevOps organization
 
