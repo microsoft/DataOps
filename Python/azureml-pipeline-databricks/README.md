@@ -24,28 +24,22 @@ following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/
 
 If you already have an Azure DevOps organization, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
 
-### Create a storage account for the Terraform state
-
-Create an Azure storage account. In the storage account, create a storage container named `terraformstate`.
-
 ### Create an ARM service connection for Terraform
 
 The `DataOpsML ARM Connection` service connection is used by the [Azure DevOps pipeline](environment_setup/terraform-init-template.yml) to creates the Azure ML workspace and associated resources through Terraform. The pipeline requires an **Azure Resource Manager**
 [service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
-
-![create service connection](./images/create-rm-service-connection.png)
 
 Leave the **``Resource Group``** field empty.
 
 **Note:** Creating the ARM service connection scope requires 'Owner' or 'User Access Administrator' permissions on the subscription.
 You must also have sufficient permissions to register an application with
 your Azure AD tenant, or receive the ID and secret of a service principal
-from your Azure AD Administrator. That principal must have 'Owner'
+from your Azure AD Administrator. That principal must have 'Contributor'
 permissions on the subscription.
 
 ### Provision an Azure Container Registry 
 
-Create an Azure Container Registry to manage the environment image.
+[Create an Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal) to store the environment image. Make sure you deploy the registry in the [region of your Azure DevOps organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/change-organization-location?view=azure-devops), to avoid cost and delays when the build image is synchronized to build agent VMs.
 
 ### Create a Registry Service Connection
 
@@ -66,6 +60,10 @@ Save and run the pipeline. This will build and push a container image to your Az
 the name you have just edited. The next step is to modify the build pipeline to run the CI job on a container
 run from that image.
 
+### Create a storage account for the Terraform state
+
+Create an Azure storage account. In the storage account, create a storage container named `terraformstate`.
+
 ### Create a Variable Group for your Pipeline
 
 We make use of a variable group inside Azure DevOps to store variables and their
@@ -77,8 +75,6 @@ learn more about how to create a variable group and
 [link](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/variable-groups?view=azure-devops&tabs=designer#use-a-variable-group) it to your pipeline.
 Click on **Library** in the **Pipelines** section as indicated below:
 
-![library_variable groups](./images/library_variable_groups.png)
-
 Create a variable group named **``terraform``**. The YAML pipeline definitions in this repository refer to this variable group by name.
 
 The variable group should contain the following required variables:
@@ -86,7 +82,6 @@ The variable group should contain the following required variables:
 | Variable Name             | Suggested Value                                                       |
 | ------------------------- | --------------------------------------------------------              |
 | BASE_NAME                 | mydataops                                                             |
-| MLPIPELINE_SP_OBJECT_ID   | [The object ID of the service principal you created]                  |
 | LOCATION                  | [The [region of your Azure DevOps organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/change-organization-location?view=azure-devops), e.g. `westus2` |
 | TERRAFORM_BACKEND_STORAGE | [The name of the storage account you created for the Terraform state] |
 | TERRAFORM_BACKEND_RG      | [The resource group of the Terraform state storage account]           |

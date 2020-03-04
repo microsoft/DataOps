@@ -39,12 +39,6 @@ resource "azurerm_container_registry" "aml" {
 }
 
 
-resource "azurerm_role_assignment" "acr_mlpipeline" {
-  scope                = azurerm_container_registry.aml.id
-  role_definition_name = "Contributor"
-  principal_id         = var.devops_mlpipeline_sp_object_id
-}
-
 # Azure ML Workspace
 
 resource "azurerm_template_deployment" "aml" {
@@ -116,25 +110,4 @@ DEPLOY
   }
 
   deployment_mode = "Incremental"
-}
-
-resource "azurerm_role_assignment" "mlworkspace_mlpipeline" {
-  scope                = azurerm_template_deployment.aml.outputs["id"]
-  role_definition_name = "Contributor"
-  principal_id         = var.devops_mlpipeline_sp_object_id
-}
-
-# Secret
-
-resource "azurerm_key_vault_access_policy" "client_keyvault" {
-  key_vault_id = azurerm_key_vault.aml.id
-
-  tenant_id = azurerm_key_vault.aml.tenant_id
-  object_id = var.object_id
-
-  secret_permissions = [
-    "get",
-    "set",
-    "delete",
-  ]
 }

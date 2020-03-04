@@ -1,8 +1,8 @@
 resources:
   containers:
   - container: mlops
-    endpoint: DataOpsML Azure Container Registry
-    image: azureml-pipeline-databricks
+    endpoint: $(REGISTRY_SVC_CONNECTION)
+    image: $(AGENT_IMAGE_NAME)
 
 pr: none
 trigger:
@@ -15,12 +15,7 @@ trigger:
 
 variables:
 - group: terraform
-- name: EXPERIMENT_NAME
-  value: azureml-pipeline-databricks
-- name: ARM_SVC_CONNECTION
-  value: DataOpsML ARM Connection
-- name: WORKSPACE_SVC_CONNECTION
-  value: DataOpsML Azure ML Workspace
+- template: variables.yml
 
 pool:
   vmImage: ubuntu-latest
@@ -33,7 +28,6 @@ stages:
     TerraformEnvVariables:
       TF_VAR_appname: $(BASE_NAME)
       TF_VAR_location: $(LOCATION)
-      TF_VAR_devops_mlpipeline_sp_object_id: $(MLPIPELINE_SP_OBJECT_ID)
 
 - stage: AML_Pipeline_CI
   displayName: Azure ML CI

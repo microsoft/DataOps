@@ -17,12 +17,3 @@ variable "location" {
 variable "tenant_id" {
   type    = string
 }
-
-variable "object_id" {
-  type    = string
-}
-
-variable "devops_mlpipeline_sp_object_id" {
-  type    = string
-  description = "Service principal object ID for the Azure DevOps ML Model CI/CD pipeline service connection"
-}

@@ -15,16 +15,15 @@ trigger:
     - Python/azureml-pipeline-databricks/environment_setup/Dockerfile
 
 variables:
-  containerRegistry: DataOpsML Azure Container Registry
-  imageName: $[coalesce(variables['agentImageName'], 'azureml-pipeline-databricks')]  
+- template: ../variables.yml
 
 steps:
   - task: Docker@2
     displayName: Build and Push
     inputs:
       command: buildAndPush
-      containerRegistry: '$(containerRegistry)'
-      repository: '$(imageName)'
+      containerRegistry: '$(REGISTRY_SVC_CONNECTION)'
+      repository: '$(AGENT_IMAGE_NAME)'
       tags: |
        $(Build.BuildNumber)
        latest
