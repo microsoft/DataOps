@@ -62,8 +62,8 @@ Also install the [Azure Machine Learning extension](https://marketplace.visualst
 
 ### Create an ARM service connection for Terraform
 
-The `DataOpsML ARM Connection` service connection is used by the [Azure DevOps pipeline](environment_setup/terraform-init-template.yml) to creates the Azure ML workspace and associated resources through Terraform. The pipeline requires an **Azure Resource Manager**
-[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
+The `DataOpsML ARM Connection` service connection is used by the [Azure DevOps pipeline](environment_setup/terraform-init-template.yml) to create the Azure ML workspace and associated resources through Terraform. The pipeline requires an **Azure Resource Manager**
+[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection) at the subscription level.
 
 Leave the **``Resource Group``** field empty.
 
