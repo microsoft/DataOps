@@ -37,31 +37,6 @@ your Azure AD tenant, or receive the ID and secret of a service principal
 from your Azure AD Administrator. That principal must have 'Contributor'
 permissions on the subscription.
 
-### Provision an Azure Container Registry 
-
-[Create an Azure Container Registry](https://docs.microsoft.com/en-us/azure/container-registry/container-registry-get-started-portal) to store the environment image. Make sure you deploy the registry in the [region of your Azure DevOps organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/change-organization-location?view=azure-devops), to avoid cost and delays when the build image is synchronized to build agent VMs.
-
-### Create a Registry Service Connection
-
-[Create a service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#sep-docreg) to your Azure Container Registry:
-- As *Connection type*, select *Docker Registry*
-- As *Registry type*, select *Azure Container Registry*
-- As *Azure container registry*, select your Container registry instance
-- As *Service connection name*, enter `DataOpsML Azure Container Registry`
-
-### Create a container build pipeline
-
-In your [Azure DevOps](https://dev.azure.com) project create a new build
-pipeline referring to the
-[environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
-pipeline definition in your forked repository.
-
-Save and run the pipeline. This will build and push a container image to your Azure Container Registry.
-
-### Create a storage account for the Terraform state
-
-Create an Azure storage account. In the storage account, create a storage container named `terraformstate`.
-
 ### Create a Variable Group for your Pipeline
 
 We make use of a variable group inside Azure DevOps to store variables and their
@@ -96,6 +71,42 @@ the BASE_NAME value should not exceed 10 characters and it should contain number
 
 Make sure to select the **Allow access to all pipelines** checkbox in the
 variable group configuration.
+
+### Run the Terraform pipeline
+
+In your [Azure DevOps](https://dev.azure.com) project create a new build
+pipeline referring to the
+[environment_setup/terraform-pipeline.yml](../environment_setup/terraform-pipeline.yml)
+pipeline definition in your forked repository.
+
+Save and run the pipeline. This will deploy the environment using Terraform, including an Azure ML Workspace.
+
+**Note:**
+
+The Terraform pipeline only runs Terraform if it is run on the `master` branch.
+If running from another branch, set the variable `RUN_FLAG_TERRAFORM` to the
+value `true` at queue time.
+
+### Create a Registry Service Connection
+
+[Create a service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#sep-docreg) to your Azure Container Registry:
+- As *Connection type*, select *Docker Registry*
+- As *Registry type*, select *Azure Container Registry*
+- As *Azure container registry*, select your Container registry instance (deployed by Terraform)
+- As *Service connection name*, enter `DataOpsML Azure Container Registry`
+
+### Create a container build pipeline
+
+In your [Azure DevOps](https://dev.azure.com) project create a new build
+pipeline referring to the
+[environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
+pipeline definition in your forked repository.
+
+Save and run the pipeline. This will build and push a container image to your Azure Container Registry.
+
+### Create a storage account for the Terraform state
+
+Create an Azure storage account. In the storage account, create a storage container named `terraformstate`.
 
 ### Create an Azure DevOps Azure ML Workspace Service Connection
 
