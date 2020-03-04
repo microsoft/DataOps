@@ -120,7 +120,6 @@ pipeline referring to the
 pipeline definition in your forked repository.
 
 Save and run the pipeline. This will deploy the environment using Terraform, creating a resource group named `rg-[BASE_NAME]-test-main` containing the following resources:
-* including a Databricks Workspace, an Azure ML Workspace and supporting resources:
 
 * A Machine Learning workspace named `aml-[BASE_NAME]-test` for managing the AML pipeline
 * A Container Registry named `acr[BASE_NAME]test`, required to provision the Azure Machine Learning workspace
