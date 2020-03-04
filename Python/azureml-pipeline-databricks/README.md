@@ -122,13 +122,13 @@ pipeline definition in your forked repository.
 Save and run the pipeline. This will deploy the environment using Terraform, creating a resource group named `rg-[BASE_NAME]-test-main` containing the following resources:
 * including a Databricks Workspace, an Azure ML Workspace and supporting resources:
 
-* A Machine Learning workspace named aml-[BASE_NAME]-test for managing the AML pipeline
-* A Container Registry named acr[BASE_NAME]test, required to provision the Azure Machine Learning workspace
-* A Key Vault named kv-[BASE_NAME]-test, required to provision the Azure Machine Learning workspace
-* A Storage account named st[BASE_NAME]test, required to provision the Azure Machine Learning workspace, used for storing the output of the AML pipeline
-* An Application Insights instance named appinsights-[BASE_NAME]-test, required to provision the Azure Machine Learning workspace
-* An Azure Databricks workspace named dbricks[BASE_NAME]test, used for running the data engineering notebook
-* A Storage account named st[BASE_NAME]trtest, where Terraform has copied a training dataset file [diabetes.csv](./environment_setup/terraform/training-data/diabetes.csv).
+* A Machine Learning workspace named `aml-[BASE_NAME]-test` for managing the AML pipeline
+* A Container Registry named `acr[BASE_NAME]test`, required to provision the Azure Machine Learning workspace
+* A Key Vault named `kv-[BASE_NAME]-test`, required to provision the Azure Machine Learning workspace
+* A Storage account named `st[BASE_NAME]test`, required to provision the Azure Machine Learning workspace, used for storing the output of the AML pipeline
+* An Application Insights instance named `appinsights-[BASE_NAME]-test`, required to provision the Azure Machine Learning workspace
+* An Azure Databricks workspace named `dbricks[BASE_NAME]test`, used for running the data engineering notebook
+* A Storage account named `st[BASE_NAME]trtest`, where Terraform has copied a training dataset file [diabetes.csv](./environment_setup/terraform/training-data/diabetes.csv).
 
 **Note:**
 
