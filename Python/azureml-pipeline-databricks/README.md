@@ -172,7 +172,7 @@ you can set up the Azure DeveOps pipeline that will run the Azure ML pipeline.
 
 In your [Azure DevOps](https://dev.azure.com) project create and run a new build
 pipeline referring to the
-[azure-pipelines.yml](azure-pipeline.yml)
+[azure-pipelines.yml](azure-pipelines.yml)
 pipeline definition in your forked repository.
 
 After the pipeline has run, you can navigate in the Azure Portal to the Azure ML Workspace
