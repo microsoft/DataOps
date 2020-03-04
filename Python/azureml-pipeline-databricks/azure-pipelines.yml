@@ -1,3 +1,5 @@
+name: ML_Pipeline
+
 resources:
   containers:
   - container: mlops
