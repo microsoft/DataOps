@@ -16,6 +16,7 @@ trigger:
     - Python/azureml-pipeline-databricks/
 
 variables:
+- group: terraform
 - template: variables.yml
 
 pool:
