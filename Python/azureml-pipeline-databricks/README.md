@@ -1,6 +1,6 @@
 # Integrating Databricks into Azure ML Pipelines with Terraform
 
-This sample automates the provisioning of an ML execution environment using Terraform, and the provisioning and execution of an Azure ML Pipeline that runs a Databricks notebook doing data engineering.
+This sample automates the provisioning of an ML execution environment using Terraform, and the provisioning and execution of an [Azure ML Pipeline](https://docs.microsoft.com/en-us/azure/machine-learning/concept-ml-pipelines) that runs a Databricks notebook doing data engineering.
 
 This sample demonstrates:
 * Deployment of Azure ML and Databricks infrastructure using Terraform (based on the [Terraform Azure DevOps starter sample](https://github.com/microsoft/terraform-azure-devops-starter)).
@@ -29,6 +29,17 @@ can also be used for model training and model batch scoring.
 | `ml_service`            | Python script for provisioning the Azure environment.       |
 | `tox.ini`               | Linting and unit test configuration.                        |
 
+## About the sample
+
+The sample contains [Terraform configuration](environment_setup/terraform) to deploy an entire environment for creating and executing a data engineering pipeline in Azure ML Pipelines.
+
+The [Databricks notebook](code/prepare/feature_engineering.py) performs very basic feature engineering by
+removing lines with NA values from an initial dataset [diabetes.csv](./environment_setup/terraform/training-data/diabetes.csv).
+
+A [unit test for the notebook](code/tests/feature_engineering_test.py) is provided and runs in CI using the [databricks-test](https://pypi.org/project/databricks-test/) module.
+
+A [Python script](ml_service/build_ml_pipeline.py) uses the [Azure ML Python SDK](https://docs.microsoft.com/en-us/python/api/overview/azure/ml/?view=azure-ml-py) to provision the notebook and a cluster pool into the Databricks environment, and programmatically define the structure of the Azure ML Pipeline, and submit the pipeline into the Azure ML workspace. The [CI/CD pipeline](azure-pipeline.yml) then proceeds to execute the Azure ML Pipeline.
+
 ## Running the sample
 
 ### Getting the code
@@ -42,6 +53,12 @@ We use Azure DevOps for running our MLOps pipeline with build (CI), ML training 
 following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
 If you already have an Azure DevOps organization, create a [new project](https://docs.microsoft.com/en-us/azure/devops/organizations/projects/create-project?view=azure-devops).
+
+### Install Azure DevOps extensions
+
+Install the [Terraform extension for Azure DevOps](https://marketplace.visualstudio.com/items?itemName=ms-devlabs.custom-terraform-tasks) from the Azure DevOps marketplace into your Azure DevOps organization.
+
+Also install the [Azure Machine Learning extension](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml).
 
 ### Create an ARM service connection for Terraform
 
@@ -58,7 +75,7 @@ permissions on the subscription.
 
 ### Create a storage account for the Terraform state
 
-Create an Azure storage account. In the storage account, create a storage container named `terraformstate`.
+[Create an Azure storage account](https://docs.microsoft.com/en-us/azure/storage/common/storage-account-create) with an arbitrary name. In the storage account, create a storage container named `terraformstate`.
 
 ### Create a Variable Group for your Pipeline
 
@@ -99,10 +116,19 @@ variable group configuration.
 
 In your [Azure DevOps](https://dev.azure.com) project create a new build
 pipeline referring to the
-[environment_setup/terraform-pipeline.yml](../environment_setup/terraform-pipeline.yml)
+[environment_setup/terraform-pipeline.yml](environment_setup/terraform-pipeline.yml)
 pipeline definition in your forked repository.
 
-Save and run the pipeline. This will deploy the environment using Terraform, including an Azure ML Workspace.
+Save and run the pipeline. This will deploy the environment using Terraform, creating a resource group named `rg-[BASE_NAME]-test-main` containing the following resources:
+* including a Databricks Workspace, an Azure ML Workspace and supporting resources:
+
+* A Machine Learning workspace named aml-[BASE_NAME]-test for managing the AML pipeline
+* A Container Registry named acr[BASE_NAME]test, required to provision the Azure Machine Learning workspace
+* A Key Vault named kv-[BASE_NAME]-test, required to provision the Azure Machine Learning workspace
+* A Storage account named st[BASE_NAME]test, required to provision the Azure Machine Learning workspace, used for storing the output of the AML pipeline
+* An Application Insights instance named appinsights-[BASE_NAME]-test, required to provision the Azure Machine Learning workspace
+* An Azure Databricks workspace named dbricks[BASE_NAME]test, used for running the data engineering notebook
+* A Storage account named st[BASE_NAME]trtest, where Terraform has copied a training dataset file [diabetes.csv](./environment_setup/terraform/training-data/diabetes.csv).
 
 **Note:**
 
@@ -122,16 +148,12 @@ value `true` at queue time.
 
 In your [Azure DevOps](https://dev.azure.com) project create a new build
 pipeline referring to the
-[environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
+[environment_setup/docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml)
 pipeline definition in your forked repository.
 
 Save and run the pipeline. This will build and push a container image to your Azure Container Registry.
 
 ### Create an Azure DevOps Azure ML Workspace Service Connection
-
-Install the **Azure Machine Learning** extension to your organization from the
-[marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
-so that you can set up a service connection to your AML workspace.
 
 Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. Name the connection `DataOpsML Azure ML Workspace` (this name is used in the variable `WORKSPACE_SVC_CONNECTION` in [azure-pipelines.yml](azure-pipeline.yml)).
 
