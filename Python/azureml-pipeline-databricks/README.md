@@ -38,7 +38,7 @@ removing lines with NA values from an initial dataset [diabetes.csv](./environme
 
 A [unit test for the notebook](code/tests/feature_engineering_test.py) is provided and runs in CI using the [databricks-test](https://pypi.org/project/databricks-test/) module.
 
-A [Python script](ml_service/build_ml_pipeline.py) uses the [Azure ML Python SDK](https://docs.microsoft.com/en-us/python/api/overview/azure/ml/?view=azure-ml-py) to provision the notebook and a cluster pool into the Databricks environment, and programmatically define the structure of the Azure ML Pipeline, and submit the pipeline into the Azure ML workspace. The [CI/CD pipeline](azure-pipeline.yml) then proceeds to execute the Azure ML Pipeline.
+A [Python script](ml_service/build_ml_pipeline.py) uses the [Azure ML Python SDK](https://docs.microsoft.com/en-us/python/api/overview/azure/ml/?view=azure-ml-py) to provision the notebook and a cluster pool into the Databricks environment, and programmatically define the structure of the Azure ML Pipeline, and submit the pipeline into the Azure ML workspace. The [CI/CD pipeline](azure-pipelines.yml) then proceeds to execute the Azure ML Pipeline.
 
 ## Running the sample
 
@@ -155,7 +155,7 @@ Save and run the pipeline. This will build and push a container image to your Az
 
 ### Create an Azure DevOps Azure ML Workspace Service Connection
 
-Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. Name the connection `DataOpsML Azure ML Workspace` (this name is used in the variable `WORKSPACE_SVC_CONNECTION` in [azure-pipelines.yml](azure-pipeline.yml)).
+Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. Name the connection `DataOpsML Azure ML Workspace` (this name is used in the variable `WORKSPACE_SVC_CONNECTION` in [azure-pipelines.yml](azure-pipelines.yml)).
 
 **Note:** Creating service connection with Azure Machine Learning workspace scope requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
 You must also have sufficient permissions to register an application with
