@@ -56,9 +56,7 @@ pipeline referring to the
 [environment_setup/docker-image-pipeline.yml](../environment_setup/docker-image-pipeline.yml)
 pipeline definition in your forked repository.
 
-Save and run the pipeline. This will build and push a container image to your Azure Container Registry with
-the name you have just edited. The next step is to modify the build pipeline to run the CI job on a container
-run from that image.
+Save and run the pipeline. This will build and push a container image to your Azure Container Registry.
 
 ### Create a storage account for the Terraform state
 
@@ -82,7 +80,7 @@ The variable group should contain the following required variables:
 | Variable Name             | Suggested Value                                                       |
 | ------------------------- | --------------------------------------------------------              |
 | BASE_NAME                 | mydataops                                                             |
-| LOCATION                  | [The [region of your Azure DevOps organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/change-organization-location?view=azure-devops), e.g. `westus2` |
+| LOCATION                  | [The [region of your Azure DevOps organization](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/change-organization-location?view=azure-devops), e.g. `westus2`] |
 | TERRAFORM_BACKEND_STORAGE | [The name of the storage account you created for the Terraform state] |
 | TERRAFORM_BACKEND_RG      | [The resource group of the Terraform state storage account]           |
 
@@ -92,7 +90,7 @@ The **BASE_NAME** parameter is used throughout the solution for naming
 Azure resources. When the solution is used in a shared subscription, there can
 be naming collisions with resources that require unique names like azure blob
 storage and registry DNS naming. Make sure to give a unique value to the
-BASE_NAME variable (e.g. myuniqueops), so that the created resources will have
+BASE_NAME variable (e.g. mydataops), so that the created resources will have
 unique names. The length of
 the BASE_NAME value should not exceed 10 characters and it should contain numbers and lowercase letters only.
 

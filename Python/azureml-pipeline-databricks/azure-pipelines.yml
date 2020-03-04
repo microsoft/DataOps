@@ -1,7 +1,7 @@
 resources:
   containers:
   - container: mlops
-    endpoint: $(REGISTRY_SVC_CONNECTION)
+    endpoint: DataOpsML Azure Container Registry
     image: $(AGENT_IMAGE_NAME)
 
 pr: none
