@@ -148,7 +148,7 @@ value `true` at queue time.
 
 In your [Azure DevOps](https://dev.azure.com) project create a new build
 pipeline referring to the
-[environment_setup/docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml)
+[docker-image-pipeline.yml](environment_setup/docker-image-pipeline.yml)
 pipeline definition in your forked repository.
 
 Save and run the pipeline. This will build and push a container image to your Azure Container Registry.
