@@ -1,7 +1,8 @@
 # Integrating Databricks into Azure ML Pipelines with Terraform
 
-This samples automates the provisioning of an ML execution environment using Terraform, and the provisioning and execution of an Azure ML Pipeline that runs a Databricks notebook doing data engineering.
+This sample automates the provisioning of an ML execution environment using Terraform, and the provisioning and execution of an Azure ML Pipeline that runs a Databricks notebook doing data engineering.
 
+This sample demonstrates:
 * Deployment of Azure ML and Databricks infrastructure using Terraform (based on the [Terraform Azure DevOps starter sample](https://github.com/microsoft/terraform-azure-devops-starter)).
 * Provisioning of Databricks accounts and notebooks with Azure AD authentication, using the [databricks-client](https://pypi.org/project/databricks-client/) module.
 * Unit testing of Databricks notebooks with PySpark, using the [databricks-test](https://pypi.org/project/databricks-test/) module.
