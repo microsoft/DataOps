@@ -2,7 +2,7 @@ resources:
   containers:
   - container: mlops
     endpoint: DataOpsML Azure Container Registry
-    image: $(AGENT_IMAGE_NAME)
+    image: azureml-pipeline-databricks
 
 pr: none
 trigger:
