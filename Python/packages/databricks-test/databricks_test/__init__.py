@@ -6,6 +6,7 @@ from tempfile import TemporaryDirectory
 import importlib
 import sys
 import os
+import pathlib
 
 
 globalSession = None
@@ -86,10 +87,11 @@ class Session():
         self.displayHTML = MagicMock()
         self.dbutils = DbUtils()
 
+        hivedirUrl = pathlib.Path(hivedir).as_uri()
         self.spark = (SparkSession.builder
                       .master("local")
                       .appName("test-pyspark")
-                      .config("spark.sql.warehouse.dir", f"file:{hivedir}")
+                      .config("spark.sql.warehouse.dir", hivedirUrl)
                       .enableHiveSupport()
                       .getOrCreate())
 
