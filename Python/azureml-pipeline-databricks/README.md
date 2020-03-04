@@ -1,6 +1,11 @@
-# Official Microsoft Sample
+# Integrating Databricks into Azure ML Pipelines with Terraform
 
-Give a short description for your sample here. What does it do and why is it important?
+This samples automates the provisioning of an ML execution environment using Terraform, and the provisioning and execution of an Azure ML Pipeline that runs a Databricks notebook doing data engineering.
+
+This sample is meant to be combined with [the MLOpsPython repository](https://github.com/microsoft/MLOpsPython)
+in order to add ETL / feature engineering to an ML training pipeline. The MLOpsPython repository
+contains templates for subsequent steps of an MLOps pipeline, such as ML model building,
+validation and scoring image deployment.
 
 ## Contents
 
@@ -10,6 +15,7 @@ Give a short description for your sample here. What does it do and why is it imp
 | `azure-pipelines.yml`   | The Azure ML build and integration pipeline.                |
 | `ci_dependencies.yml`   | The image definition for the CI environment.                |
 | `code`                  | The Databricks feature engineering notebook and unit tests. |
+| `docs`                  | Images for this README file.                                |
 | `environment_setup`     | Pipelines and configuration for building the environment.   |
 | `ml_service`            | Python script for provisioning the Azure environment.       |
 | `tox.ini`               | Linting and unit test configuration.                        |
@@ -18,7 +24,7 @@ Give a short description for your sample here. What does it do and why is it imp
 
 ### Create an Azure DevOps organization
 
-We use Azure DevOps for running our multi-stage pipeline with build (CI), ML training and scoring service release
+We use Azure DevOps for running our MLOps pipeline with build (CI), ML training and scoring service release
 (CD) stages. If you don't already have an Azure DevOps organization, create one by
 following the instructions [here](https://docs.microsoft.com/en-us/azure/devops/organizations/accounts/create-organization?view=azure-devops).
 
@@ -36,6 +42,10 @@ You must also have sufficient permissions to register an application with
 your Azure AD tenant, or receive the ID and secret of a service principal
 from your Azure AD Administrator. That principal must have 'Contributor'
 permissions on the subscription.
+
+### Create a storage account for the Terraform state
+
+Create an Azure storage account. In the storage account, create a storage container named `terraformstate`.
 
 ### Create a Variable Group for your Pipeline
 
@@ -104,17 +114,13 @@ pipeline definition in your forked repository.
 
 Save and run the pipeline. This will build and push a container image to your Azure Container Registry.
 
-### Create a storage account for the Terraform state
-
-Create an Azure storage account. In the storage account, create a storage container named `terraformstate`.
-
 ### Create an Azure DevOps Azure ML Workspace Service Connection
 
 Install the **Azure Machine Learning** extension to your organization from the
 [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml),
 so that you can set up a service connection to your AML workspace.
 
-Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. Name the connection `DataOpsML Azure ML Workspace` (this name is used in the variable `WORKSPACE_SVC_CONNECTION` in [azure-pipelines.yml](azure-pipeline.yml).
+Create a service connection to your ML workspace via the [Azure DevOps Azure ML task instructions](https://marketplace.visualstudio.com/items?itemName=ms-air-aiagility.vss-services-azureml) to be able to execute the Azure ML training pipeline. Name the connection `DataOpsML Azure ML Workspace` (this name is used in the variable `WORKSPACE_SVC_CONNECTION` in [azure-pipelines.yml](azure-pipeline.yml)).
 
 **Note:** Creating service connection with Azure Machine Learning workspace scope requires 'Owner' or 'User Access Administrator' permissions on the Workspace.
 You must also have sufficient permissions to register an application with
@@ -122,14 +128,10 @@ your Azure AD tenant, or receive the ID and secret of a service principal
 from your Azure AD Administrator. That principal must have Contributor
 permissions on the Azure ML Workspace.
 
-### Set up Multi-Stage Pipeline
+### Set up MLOps Pipeline
 
 Now that you have all the required resources created from the IaC pipeline,
-you can set up the pipeline necessary for deploying your ML model
-to production. The pipeline has a sequence of stages for:
-
-1. **Terraform:** provisions the Azure environment including Azure ML workspace and Databricks workspace.
-1. **Azure ML CI:** performs linting, unit testing, uploads notebooks to Databricks, sets up the Azure ML connection to Databricks, and publishes a training pipeline. Invokes the Azure ML service to trigger the published training pipeline to train, evaluate, and register a model.
+you can set up the Azure DeveOps pipeline that will run the Azure ML pipeline.
 
 ### Set up the Pipeline
 
@@ -137,3 +139,13 @@ In your [Azure DevOps](https://dev.azure.com) project create and run a new build
 pipeline referring to the
 [azure-pipelines.yml](azure-pipeline.yml)
 pipeline definition in your forked repository.
+
+After the pipeline has run, you can navigate in the Azure Portal to the Azure ML Workspace
+and visualize the Azure ML pipeline result.
+
+![ML lifecycle](docs/images/azureml-pipeline.png)
+
+The pipeline output shows a reference to the storage account location where the output
+data is stored. You can navigate to that dataset in the Azure Portal.
+
+![ML lifecycle](docs/images/output-dataset.png)

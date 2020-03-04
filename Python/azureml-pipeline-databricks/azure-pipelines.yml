@@ -1,4 +1,4 @@
-name: ML_Pipeline
+name: ML-Pipeline
 
 resources:
   containers:
