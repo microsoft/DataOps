@@ -1,0 +1,18 @@
+pr: none
+trigger: none
+
+variables:
+- group: terraform
+- template: ../variables.yml
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+
+- template: terraform-stages-template.yml
+  parameters:
+    environment: test
+    TerraformEnvVariables:
+      TF_VAR_appname: $(BASE_NAME)
+      TF_VAR_location: $(LOCATION)

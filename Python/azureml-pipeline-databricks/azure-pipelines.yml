@@ -14,20 +14,12 @@ trigger:
     - Python/azureml-pipeline-databricks/
 
 variables:
-- group: terraform
 - template: variables.yml
 
 pool:
   vmImage: ubuntu-latest
 
 stages:
-
-- template: environment_setup/terraform-stage-template.yml
-  parameters:
-    environment: test
-    TerraformEnvVariables:
-      TF_VAR_appname: $(BASE_NAME)
-      TF_VAR_location: $(LOCATION)
 
 - stage: AML_Pipeline_CI
   displayName: Azure ML CI
