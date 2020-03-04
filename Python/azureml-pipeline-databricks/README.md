@@ -46,7 +46,7 @@ If you already have an Azure DevOps organization, create a [new project](https:/
 ### Create an ARM service connection for Terraform
 
 The `DataOpsML ARM Connection` service connection is used by the [Azure DevOps pipeline](environment_setup/terraform-init-template.yml) to create the Azure ML workspace and associated resources through Terraform. The pipeline requires an **Azure Resource Manager**
-[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection).
+[service connection](https://docs.microsoft.com/en-us/azure/devops/pipelines/library/service-endpoints?view=azure-devops&tabs=yaml#create-a-service-connection) at the subscription level.
 
 Leave the **``Resource Group``** field empty.
 
