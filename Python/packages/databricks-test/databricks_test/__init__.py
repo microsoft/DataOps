@@ -2,9 +2,11 @@ from unittest.mock import MagicMock
 import inspect
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import udf
+from tempfile import TemporaryDirectory
 import importlib
 import sys
 import os
+import pathlib
 
 
 globalSession = None
@@ -80,13 +82,16 @@ class DbUtils(object):
 
 
 class Session():
-    def __init__(self):
+    def __init__(self, hivedir):
         self.display = MagicMock()
         self.displayHTML = MagicMock()
         self.dbutils = DbUtils()
+
+        hivedirUrl = pathlib.Path(hivedir).as_uri()
         self.spark = (SparkSession.builder
                       .master("local")
                       .appName("test-pyspark")
+                      .config("spark.sql.warehouse.dir", hivedirUrl)
                       .enableHiveSupport()
                       .getOrCreate())
 
@@ -101,6 +106,13 @@ class Session():
                     importlib.import_module(script)
                 else:
                     # If script was already imported, reload it to rerun it
+
+                    # Per importlib docs: When a module is reloaded, its
+                    # dictionary (global variables) is retained.
+                    # Delete dbutils to ensure inject_variables gets called.
+                    del sys.modules[script].dbutils
+
+                    # Reload the notebook module
                     importlib.reload(sys.modules[script])
         except WorkflowInterrupted:
             pass
@@ -136,12 +148,14 @@ class session():
         global globalSession
         if globalSession:
             raise SessionAlreadyExistsException("A session already exists")
-        globalSession = Session()
+        self.tmpdir = TemporaryDirectory()
+        globalSession = Session(self.tmpdir.name)
         return globalSession
 
     def __exit__(self, exc_type, exc_value, traceback):
         global globalSession
         globalSession = None
+        del self.tmpdir
 
 
 class add_path():
