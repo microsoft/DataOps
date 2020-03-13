@@ -1,0 +1,115 @@
+name: ML-Pipeline
+
+resources:
+  containers:
+  - container: mlops
+    endpoint: DataOpsML Azure Container Registry
+    image: azureml-pipeline-databricks
+
+pr: none
+trigger:
+  branches:
+    include:
+    - master
+  paths:
+    include:
+    - Python/azureml-pipeline-databricks/
+
+variables:
+- group: terraform
+- template: variables.yml
+
+pool:
+  vmImage: ubuntu-latest
+
+stages:
+
+- stage: AML_Pipeline_CI
+  displayName: Azure ML CI
+  jobs:
+  - job: ReadTerraform
+    displayName: Use Terraform outputs
+    steps:
+
+    - template: environment_setup/terraform-init-template.yml
+      parameters:
+        TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
+        environment: test
+
+    - template: environment_setup/terraform-outputs-template.yml
+      parameters:
+        TerraformDirectory: Python/azureml-pipeline-databricks/environment_setup/terraform
+
+  - job: Build_Pipeline
+    dependsOn: ReadTerraform
+    displayName: Build ML Training Pipeline
+    container: mlops
+    timeoutInMinutes: 0
+    variables:
+      SUBSCRIPTION_ID: $[ dependencies.ReadTerraform.outputs['Outputs.subscription_id'] ]
+      RESOURCE_GROUP: $[ dependencies.ReadTerraform.outputs['Outputs.resource_group_name'] ]
+      AML_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.aml_workspace_name'] ]
+      DATABRICKS_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.databricks_workspace_name'] ]
+      TRAINING_DATA_ACCOUNT_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.training_data_account_name'] ]
+   
+    steps:
+    - script: |   
+       flake8 --output-file=lint-testresults.xml --format junit-xml
+      displayName: 'Run lint tests'
+      workingDirectory: Python/azureml-pipeline-databricks
+    
+    - script: |   
+       python -m pytest . --cov=code --cov-report=html --cov-report=xml --junitxml=unit-testresults.xml
+      condition: succeededOrFailed()
+      displayName: 'Run unit tests'
+      workingDirectory: Python/azureml-pipeline-databricks
+    
+    - task: PublishTestResults@2
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFiles: '**/*-testresults.xml'
+        testRunTitle: 'Linting & Unit tests'
+        failTaskOnFailedTests: true
+      displayName: 'Publish test results'
+   
+    - task: PublishCodeCoverageResults@1
+      displayName: 'Publish coverage report'
+      condition: succeededOrFailed()
+      inputs:
+        codeCoverageTool: Cobertura
+        summaryFileLocation: '**/coverage.xml'
+        reportDirectory: '**/htmlcov'
+        failIfCoverageEmpty: true
+   
+    - task: AzureCLI@1
+      name: TrainPipeline
+      inputs:
+        azureSubscription: '$(ARM_SVC_CONNECTION)'
+        scriptLocation: inlineScript
+        workingDirectory: Python/azureml-pipeline-databricks
+        inlineScript: |
+          set -e # fail on error
+
+          # Set up environment and build AML pipeline.
+          # Also sets the AMLPIPELINE_ID job variable.
+          python -m ml_service.build_ml_pipeline
+
+      displayName: 'Publish Azure Machine Learning Pipeline'
+
+  - job: "Run_ML_Pipeline"
+    dependsOn: Build_Pipeline
+    displayName: "Trigger ML Training Pipeline"
+    pool: server
+    variables:
+      SUBSCRIPTION_ID: $[ dependencies.ReadTerraform.outputs['Outputs.subscription_id'] ]
+      RESOURCE_GROUP: $[ dependencies.ReadTerraform.outputs['Outputs.resource_group_name'] ]
+      AML_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.aml_workspace_name'] ]
+      DATABRICKS_WORKSPACE_NAME: $[ dependencies.ReadTerraform.outputs['Outputs.databricks_workspace_name'] ]
+      AMLPIPELINE_ID: $[ dependencies.Build_Pipeline.outputs['TrainPipeline.AMLPIPELINE_ID'] ]
+    steps:
+    - task: ms-air-aiagility.vss-services-azureml.azureml-restApi-task.MLPublishedPipelineRestAPITask@0
+      displayName: 'Invoke ML pipeline'
+      inputs:
+        azureSubscription: '$(WORKSPACE_SVC_CONNECTION)'
+        PipelineId: '$(AMLPIPELINE_ID)'
+        ExperimentName: '$(EXPERIMENT_NAME)'

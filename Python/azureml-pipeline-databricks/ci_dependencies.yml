@@ -1,0 +1,33 @@
+name: dataops_ci
+
+dependencies:
+
+  # The python interpreter version.
+- python=3.7.5
+
+- psutil=5.6 #latest
+
+- pip=20.0.2
+- pip:
+
+  # dependencies shared with other environment .yml files.
+  - azureml-sdk==1.0.85
+
+  # Additional pip dependencies for the CI environment.
+  - databricks-client==0.0.2
+  - databricks-test==0.0.1
+  - pytest==5.3.1
+  - pytest-mock==1.13.0
+  - pytest-cov==2.8.1
+  - requests==2.22.0
+  - python-dotenv==0.10.3
+  - flake8==3.7.9
+  - flake8_formatter_junit_xml==0.0.6
+  - azure-cli==2.1.0
+  - tox==3.14.3
+  # required for azure.common.credentials.get_azure_cli_credentials
+  - azure-core==1.2.2
+  # Runtime modules for Spark - match Databricks runtime 6.2
+  - pyspark==2.4.4
+  - pandas==0.24.2
+  - pyarrow==0.13.0

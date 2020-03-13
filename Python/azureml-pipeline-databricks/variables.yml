@@ -1,0 +1,11 @@
+variables:
+- name: EXPERIMENT_NAME
+  value: azureml-pipeline-databricks
+- name: ARM_SVC_CONNECTION
+  value: DataOpsML ARM Connection
+- name: WORKSPACE_SVC_CONNECTION
+  value: DataOpsML Azure ML Workspace
+- name: REGISTRY_SVC_CONNECTION
+  value: DataOpsML Azure Container Registry
+- name: AGENT_IMAGE_NAME
+  value: azureml-pipeline-databricks
