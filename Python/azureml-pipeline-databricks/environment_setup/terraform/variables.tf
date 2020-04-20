@@ -10,6 +10,9 @@ variable "environment" {
   default = "dev"
 }
 
+# The total number of characters of the appname and environment variables additioned
+# Should not exceed 8 characters
+
 variable "location" {
   type    = string
   description = "Azure region where to create resources."
