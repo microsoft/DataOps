@@ -13,3 +13,15 @@ variable "resource_group_name" {
 variable "location" {
   type    = string
 }
+
+variable "vnet_name" {
+  type = string
+}
+
+variable "private_subnet_name" {
+  type    = string
+}
+
+variable "public_subnet_name" {
+  type    = string
+}
